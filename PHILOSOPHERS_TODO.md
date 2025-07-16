@@ -202,3 +202,5 @@ if (all_philosophers_finished_eating(datas))
 # ./philo 200 800 200 200    Ölmemesi gerek ölüyor
 # $ ./philo 200 401 200 200     çok geç ölüm mesajı yazıyor
 # Ölüm mesajı bazen 100-200 ms geç yazılıyor
+# must meal argümanı sıkıntılı bittikten sonra düşünüyor, uyuyuor
+# Mutexler destroy edilecek mi ? (EVET) 

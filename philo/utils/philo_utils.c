@@ -6,7 +6,7 @@
 /*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/17 17:46:25 by huozturk          #+#    #+#             */
-/*   Updated: 2025/07/08 15:05:07 by huozturk         ###   ########.fr       */
+/*   Updated: 2025/07/14 15:39:06 by huozturk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	*say_hello(void *arg)
 	{
 		philo_take_fork(philo);
 		philo_eat(philo);
-		// ✅ IMPORTANT: Unlock in reverse order for consistency
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		philo_sleep(philo);
@@ -47,7 +46,12 @@ void	init_philo(t_data *data, char *argv[], int argc)
 	
 	i = 0;
 	parse_args(argv, data, argc);
-	data->philos = calloc(sizeof(t_philo), data->philo_count); //ft_calloc eklenecek
+	
+	data->forks = NULL;
+	data->philos = NULL;
+	data->is_dead = 0;
+	data->dead_index = -1;
+	data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
 	error_check(data, ERR_MALLOC_FAIL, data->philos);
 	while (i < data->philo_count)
 	{
@@ -57,11 +61,8 @@ void	init_philo(t_data *data, char *argv[], int argc)
 		data->philos[i].eat_count = 0;
 		i++;
 	}
-	if ((data->philo_count != data->philos[i - 1].id)) // DÜZELECEK
-	{
-		printf("LAST_ID: %d\n", data->philos[i - 1].id);
-		exit(1);
-	}
+	if ((data->philo_count != data->philos[i - 1].id))
+		error_check(data, ERR_THREAD_FAIL, NULL);
 }
 
 void	create_philo(t_data *data)
@@ -79,25 +80,21 @@ void	create_philo(t_data *data)
 	}
 }
 
-void	init_forks(t_data *data)
+void	init_forks(t_data *data) // Mutexler destroy edilecek mi ?
 {
 	int	i;
 
 	i = -1;
-	data->forks = malloc(data->philo_count * sizeof(pthread_mutex_t)); //ft_calloc eklenecek
+	error_check_mutex(data, pthread_mutex_init(&data->death_mutex, NULL));
+	error_check_mutex(data, pthread_mutex_init(&data->start_flag_mutex, NULL));
+	error_check_mutex(data, pthread_mutex_init(&data->check_meal_mutex, NULL));
+	error_check_mutex(data, pthread_mutex_init(&data->print_mutex, NULL));
+	data->forks = ft_calloc(data->philo_count, sizeof(pthread_mutex_t));
 	error_check(data, ERR_MALLOC_FAIL, data->forks);
-	
-	// Initialize global mutexes
-	// checkler eklenicek
-	pthread_mutex_init(&data->death_mutex, NULL);
-	pthread_mutex_init(&data->start_flag_mutex, NULL);
-	pthread_mutex_init(&data->check_meal_mutex, NULL);
-	pthread_mutex_init(&data->print_mutex, NULL);
 	while (++i < data->philo_count)
 	{
-		pthread_mutex_init(&data->forks[i], NULL); // AÇILDI MI AÇILMADI MI CHECK
-		pthread_mutex_init(&data->philos[i].meal_mutex, NULL);
-		
+		error_check_mutex(data, pthread_mutex_init(&data->forks[i], NULL));
+		error_check_mutex(data, pthread_mutex_init(&data->philos[i].meal_mutex, NULL));
 	}
 
 	i = -1;

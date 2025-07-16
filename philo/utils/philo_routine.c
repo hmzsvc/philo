@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hsyn <hsyn@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 12:07:58 by huozturk          #+#    #+#             */
-/*   Updated: 2025/07/11 16:59:54 by huozturk         ###   ########.fr       */
+/*   Updated: 2025/07/12 20:33:06 by hsyn             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	philo_sleep(t_philo *philo)
 	usleep(philo->data->time_to_sleep * 1000);
 }
 
-void	philo_thinking(t_philo *philo)
+void	philo_thinking(t_philo *philo) // BAKILACAK
 {
 	print(philo, "is thinking");
 	

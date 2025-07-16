@@ -1,6 +1,6 @@
 # Philosophers Project - Kod İşleyiş Açıklaması 📚
 
-## 📅 Hazırlanma Tarihi: 11 Temmuz 2025
+## 📅 Hazırlanma Tarihi: 16 Temmuz 2025 (Güncellenmiş)
 
 Bu dosya, Philosophers projesinin kod akışını **çalışma sırasına göre** detaylı olarak açıklar.
 
@@ -15,16 +15,10 @@ int main(int argc, char *argv[])
 {
     t_data data;                    // Ana veri yapısını tanımla
     
-    // 🔧 BAŞLANGIÇ DEĞERLERİ AYARLAMA
-    data.is_dead = 0;              // Hiç kimse ölmedi
-    data.dead_index = -1;          // Ölen filozof yok
-    data.forks = NULL;             // Çatallar henüz oluşturulmadı
-    data.philos = NULL;            // Filozoflar henüz oluşturulmadı
-    
-    // 🔍 ARGÜMAN KONTROLÜ
+    //  ARGÜMAN KONTROLÜ
     if (argc == 5 || argc == 6)   // 5 veya 6 argüman kabul ediliyor
     {
-        // ⚙️ ADIM 1: Filozofları initialize et
+        // ⚙️ ADIM 1: Filozofları initialize et (içeride tüm değerler ayarlanır)
         init_philo(&data, argv, argc);
         
         // ⚙️ ADIM 2: Çatalları (mutex'leri) oluştur
@@ -90,8 +84,14 @@ void init_philo(t_data *data, char *argv[], int argc)
     // 🔍 ARGÜMANLARI PARSE ET
     parse_args(argv, data, argc);
     
-    // 🧠 BELLEK AYIR: Filozof sayısı kadar t_philo yapısı
-    data->philos = calloc(sizeof(t_philo), data->philo_count);
+    // 🔧 BAŞLANGIÇ DEĞERLERİ AYARLAMA (artık burada yapılıyor)
+    data->forks = NULL;              // Çatallar henüz oluşturulmadı
+    data->philos = NULL;             // Filozoflar henüz oluşturulmadı
+    data->is_dead = 0;               // Hiç kimse ölmedi
+    data->dead_index = -1;           // Ölen filozof yok
+    
+    // 🧠 BELLEK AYIR: Filozof sayısı kadar t_philo yapısı (ft_calloc kullanılıyor)
+    data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
     error_check(data, ERR_MALLOC_FAIL, data->philos);
     
     // 🔄 HER BİR FİLOZOFU AYARLA
@@ -107,8 +107,8 @@ void init_philo(t_data *data, char *argv[], int argc)
     // ✅ KONTROL: Son filozofun ID'si toplam sayıya eşit mi?
     if ((data->philo_count != data->philos[i - 1].id))
     {
-        printf("LAST_ID: %d\n", data->philos[i - 1].id);
-        exit(1);
+        // ❌ HATA: Thread initialization hatası
+        error_check(data, ERR_THREAD_FAIL, NULL);
     }
 }
 ```
@@ -157,19 +157,18 @@ int ft_atoi(char *str, int *res)
     if (check_long(str))
         return (1);
     
-    // ➕➖ İŞARET KONTROLÜ
+    // ➕➖ İŞARET KONTROLÜ (i++ optimizasyonu)
     while (*(str + i) == '+' || *(str + i) == '-')
     {
-        if (*(str + i) == '-')
+        if (*(str + i++) == '-')
             sign *= -1;
-        i++;
     }
     
     // 🔢 RAKAM DÖNÜŞÜMÜ
     while ((*(str + i) >= '0' && *(str + i) <= '9') || *(str + i) != '\0')
     {
         if (!(*(str + i) >= '0' && *(str + i) <= '9'))
-            return (1);  // Geçersiz karakter
+            error_check(NULL, ERR_ATOI_FAIL, NULL);  // Artık error_check çağırıyor
         else
             *res = (*res * 10) + (*(str + i) - '0');
         i++;
@@ -179,7 +178,7 @@ int ft_atoi(char *str, int *res)
     
     // ✅ POZITIF SAYI KONTROLÜ
     if (*res <= 0)
-        return (1);
+        error_check(NULL, ERR_ATOI_FAIL, NULL);  // Artık error_check çağırıyor
     
     return (0);
 }
@@ -196,21 +195,21 @@ void init_forks(t_data *data)
 {
     int i = -1;
     
-    // 🧠 ÇATALLAR İÇİN BELLEK AYIR
-    data->forks = malloc(data->philo_count * sizeof(pthread_mutex_t));
-    error_check(data, ERR_MALLOC_FAIL, data->forks);
+    // 🔐 GLOBAL MUTEX'LERİ BAŞLAT (error_check_mutex ile güvenli)
+    error_check_mutex(data, pthread_mutex_init(&data->death_mutex, NULL));
+    error_check_mutex(data, pthread_mutex_init(&data->start_flag_mutex, NULL));
+    error_check_mutex(data, pthread_mutex_init(&data->check_meal_mutex, NULL));
+    error_check_mutex(data, pthread_mutex_init(&data->print_mutex, NULL));
     
-    // 🔐 GLOBAL MUTEX'LERİ BAŞLAT
-    pthread_mutex_init(&data->death_mutex, NULL);        // Ölüm durumu koruması
-    pthread_mutex_init(&data->start_flag_mutex, NULL);   // Başlangıç bayrağı koruması
-    pthread_mutex_init(&data->check_meal_mutex, NULL);   // Yemek kontrolü koruması
-    pthread_mutex_init(&data->print_mutex, NULL);        // Konsol çıktısı koruması
+    // 🧠 ÇATALLAR İÇİN BELLEK AYIR (ft_calloc kullanılıyor)
+    data->forks = ft_calloc(data->philo_count, sizeof(pthread_mutex_t));
+    error_check(data, ERR_MALLOC_FAIL, data->forks);
     
     // 🔄 HER ÇATAL VE FİLOZOF MUTEX'İNİ BAŞLAT
     while (++i < data->philo_count)
     {
-        pthread_mutex_init(&data->forks[i], NULL);              // Çatal mutex'i
-        pthread_mutex_init(&data->philos[i].meal_mutex, NULL);  // Yemek mutex'i
+        error_check_mutex(data, pthread_mutex_init(&data->forks[i], NULL));
+        error_check_mutex(data, pthread_mutex_init(&data->philos[i].meal_mutex, NULL));
     }
     
     // 🔗 ÇATAL ATAMASI (Circular arrangement)
@@ -590,21 +589,129 @@ void philo_dead(t_philo philo)
 ```c
 void cleanup(t_data *data)
 {
+    // 🔐 MUTEX'LERİ DESTROY ET (yeni eklenen fonksiyon)
+    destroy_mutex(data);
+    
     // 🧠 BELLEK TEMİZLEME
     if (data->philos)
         free(data->philos);
     if (data->forks)
         free(data->forks);
+}
+
+// 🔐 YENİ FONKSİYON: Tüm mutex'leri güvenli şekilde destroy et
+void destroy_mutex(t_data *data)
+{
+    int i = -1;
     
-    // 🔐 MUTEX'LERİ DESTROY ET (Normalde yapılmalı)
-    // pthread_mutex_destroy(&data->death_mutex);
-    // pthread_mutex_destroy(&data->start_flag_mutex);
-    // pthread_mutex_destroy(&data->check_meal_mutex);
-    // pthread_mutex_destroy(&data->print_mutex);
-    // ... fork ve meal mutex'leri de
+    // Global mutex'leri destroy et
+    pthread_mutex_destroy(&data->check_meal_mutex);
+    pthread_mutex_destroy(&data->death_mutex);
+    pthread_mutex_destroy(&data->print_mutex);
+    pthread_mutex_destroy(&data->start_flag_mutex);
+    
+    // Fork mutex'lerini destroy et
+    if (data->forks)
+    {
+        while (++i < data->philo_count)
+            pthread_mutex_destroy(&data->forks[i]);
+    }
 }
 ```
 
+---
+
+## 🔧 **YENİ YARDIMCI FONKSİYONLAR**
+
+### 📁 **Dosya:** `utils/helpers.c`
+
+### 🧠 **Bellek Ayırma - ft_calloc():**
+
+```c
+void *ft_calloc(size_t count, size_t size)
+{
+    void *memory;
+    
+    // 🧠 BELLEK AYIR
+    memory = malloc(count * size);
+    if (memory == NULL)
+        return (NULL);
+    
+    // 🔄 BELLEK SIFIRLA (ft_memset kullanarak)
+    ft_memset(memory, 0, size * count);
+    return (memory);
+}
+
+// 🔄 BELLEK SIFIRLAMA FONKSİYONU
+void *ft_memset(void *b, int c, size_t len)
+{
+    unsigned char *str = (unsigned char *)b;
+    
+    while (len > 0)
+    {
+        *str = (unsigned char)c;
+        len--;
+        str++;
+    }
+    return (b);
+}
+```
+
+### 🔐 **Mutex Hata Kontrolü - error_check_mutex():**
+
+```c
+void error_check_mutex(t_data *data, int value)
+{
+    if (value == 0)
+        return;  // Başarılı
+    
+    // ❌ MUTEX HATASI
+    if (value != 0)
+        fprintf(stderr, "ERR_MUTEX_FAIL\n");
+    
+    // 🧹 CLEANUP VE ÇIK
+    if (data)
+        cleanup(data);
+    exit(1);
+}
+```
+
+### 🚨 **Genişletilmiş Error Handling:**
+
+```c
+void error_check(t_data *data, int err_code, void *ptr)
+{
+    if (ptr)
+        return;  // Hata yok
+    
+    // 🔍 ERROR MESAJLARI
+    if (err_code == ERR_MALLOC_FAIL)
+        printf("ERR_MALLOC_FAIL\n");
+    else if (err_code == ERR_INVALID_ARG)
+        printf("ERR_INVALID_ARG\n");
+    else if (err_code == ERR_THREAD_FAIL)
+        printf("ERR_THREAD_FAIL\n");        // YENİ!
+    else if (err_code == ERR_ATOI_FAIL)
+        printf("ERR_ATOI_FAIL\n");          // YENİ!
+    
+    // 🧹 CLEANUP VE ÇIK
+    if (data)
+        cleanup(data);
+    exit(1);
+}
+```
+
+### 📋 **Yeni Error Kodları:**
+
+```c
+typedef enum s_error_code
+{
+    ERR_MALLOC_FAIL = 1,
+    ERR_INVALID_ARG = 2,
+    ERR_THREAD_FAIL = 3,    // YENİ!
+    ERR_ATOI_FAIL = 4,      // YENİ!
+} t_error_code;
+```
 ---
 
 ## 🔄 **ÖZET: PROGRAM AKIŞ DİYAGRAMI**
@@ -614,9 +721,9 @@ MAIN() BAŞLANGICI
     ↓
 1. ARGÜMAN KONTROLÜ (argc == 5 veya 6)
     ↓
-2. INIT_PHILO() - Filozof yapılarını oluştur
+2. INIT_PHILO() - Filozof yapılarını oluştur + başlangıç değerleri
     ↓
-3. INIT_FORKS() - Çatal mutex'lerini oluştur
+3. INIT_FORKS() - Çatal mutex'lerini oluştur (error_check_mutex ile)
     ↓
 4. MONITOR_PHILO() - Monitor thread'ini başlat
     ↓ 
@@ -642,7 +749,7 @@ PARALEL ÇALIŞMA:
     ↓
 7. PHILO_JOIN() - Tüm thread'lerin bitmesini bekle
     ↓
-8. CLEANUP() - Bellek temizleme
+8. CLEANUP() - Bellek temizleme + mutex destroy
     ↓
 PROGRAM SONU
 ```
@@ -673,8 +780,10 @@ PROGRAM SONU
 1. **Race Condition Önleme**: Tüm shared data mutex ile korunuyor
 2. **Deadlock Önleme**: Çatal alma sıralaması ve özel durumlar
 3. **CPU Spinning Önleme**: usleep() çağrıları
-4. **Memory Management**: Doğru malloc/free kullanımı
+4. **Memory Management**: ft_calloc() ve proper cleanup ile güvenli bellek yönetimi
 5. **Thread Synchronization**: Başlangıç ve bitiş senkronizasyonu
+6. **Error Handling**: Kapsamlı error checking ve graceful exit
+7. **Mutex Management**: Proper initialization ve destroy işlemleri
 
 ---
 
@@ -684,5 +793,31 @@ PROGRAM SONU
 2. **Thinking Time**: Tek sayıda filozof için özel hesaplama
 3. **Staggered Start**: Tek ID'li filozoflar için gecikme
 4. **Efficient Locking**: Minimum lock süreleri
+5. **Memory Zeroing**: ft_calloc() ile initialize edilmiş bellek
+6. **Error Prevention**: Proactive error checking ile runtime hatalarını önleme
 
-Bu kod akışı, klasik Dining Philosophers problemini thread-safe ve deadlock-free şekilde çözer! 🎯
+---
+
+## 🔧 **GÜNCEL DEĞİŞİKLİKLER ÖZET**
+
+### ✅ **Yeni Eklenenler:**
+- **ft_calloc()**: Güvenli bellek ayırma ve sıfırlama
+- **ft_memset()**: Bellek sıfırlama yardımcı fonksiyonu
+- **error_check_mutex()**: Mutex initialization error kontrolü
+- **destroy_mutex()**: Proper mutex cleanup
+- **ERR_THREAD_FAIL** & **ERR_ATOI_FAIL**: Yeni error kodları
+
+### 🔄 **Güncellenmiş Fonksiyonlar:**
+- **main()**: Sadeleştirildi, initialization init_philo()'ya taşındı
+- **init_philo()**: Başlangıç değerlerini de ayarlıyor
+- **init_forks()**: error_check_mutex() ile güvenli initialization
+- **ft_atoi()**: Direkt error_check() çağırıyor
+- **cleanup()**: destroy_mutex() çağrısı eklendi
+
+### 🚀 **İyileştirmeler:**
+- **Daha Güvenli Memory Management**: ft_calloc() kullanımı
+- **Better Error Handling**: Kapsamlı error checking
+- **Proper Cleanup**: Mutex destroy işlemleri
+- **Code Organization**: Initialization logic'in daha iyi organize edilmesi
+
+Bu kod akışı, klasik Dining Philosophers problemini thread-safe, memory-safe ve deadlock-free şekilde çözer! 🎯

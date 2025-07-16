@@ -4,13 +4,14 @@ SRC_DIR				= src/
 UTL_DIR				= utils/
 ERR_DIR				= error/
 CC					= @cc
-CFLAGS				= -Wall -Wextra -Werror -pthread
+CFLAGS				= -Wall -Wextra -Werror -pthread -g
 # DEBUG_FLAGS		= -fsanitize=address -g  # Memory debugging
 # THREAD_FLAGS		= -fsanitize=thread -g   # Thread debugging (sistem sorunu var)
 RM					= rm -rf
 
 PHILO_DIR			=	$(SRC_DIR)philo.c \
 							$(UTL_DIR)monitor.c \
+							$(UTL_DIR)monitor_utils.c \
 							$(UTL_DIR)utils.c \
 							$(UTL_DIR)helpers.c \
 							$(UTL_DIR)philo_utils.c \
