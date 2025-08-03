@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   error.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/17 17:46:22 by huozturk          #+#    #+#             */
-/*   Updated: 2025/07/23 14:48:34 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:27 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/02 20:55:28 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #ifndef ERROR_H
 # define ERROR_H

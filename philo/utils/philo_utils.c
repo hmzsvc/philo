@@ -5,10 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/17 17:46:25 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/02 14:50:35 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 22:08:45 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 #include "../lib/error.h"
@@ -55,7 +57,7 @@ static void	*philo_process(void *arg)
 	return (NULL);
 }
 
-void	init_philo(t_data *data, char *argv[], int argc)
+void	initialize_table(t_table *data, char *argv[], int argc)
 {
 	int	i;
 
@@ -66,12 +68,12 @@ void	init_philo(t_data *data, char *argv[], int argc)
 	data->is_dead = 0;
 	data->dead_index = -1;
 	data->start_flag = 0;
-	data->must_meal_num = 0;
+	data->must_meal_loop = 0;
 	data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
-	error_check(data, ERR_MALLOC_FAIL, data->philos);
+	handle_error(data, ERR_MALLOC_FAIL, data->philos);
 	while (i < data->philo_count)
 	{
-		data->philos[i].id = i + 1;
+		data->philos[i].identity = i + 1;
 		data->philos[i].data = data;
 		data->philos[i].last_meal_time = get_time_in_ms();
 		data->philos[i].eat_count = 0;
@@ -79,10 +81,10 @@ void	init_philo(t_data *data, char *argv[], int argc)
 		data->philos[i].right_fork_bool = 0;
 		i++;
 	}
-	if ((data->philo_count != data->philos[i - 1].id))
-		error_check(data, ERR_THREAD_FAIL, NULL);
+	if ((data->philo_count != data->philos[i - 1].identity))
+		handle_error(data, ERR_THREAD_FAIL, NULL);
 }
-void	create_philo(t_data *data)
+void	create_philo(t_table *data)
 {
 	int	i;
 
@@ -110,24 +112,24 @@ void	create_philo(t_data *data)
 	pthread_mutex_unlock(&data->start_flag_mutex);
 }
 
-void	init_forks(t_data *data)
+void	initialize_forks(t_table *data)
 {
 	int	i;
 
 	i = -1;
-	error_check_mutex(data, pthread_mutex_init(&data->death_mutex, NULL));
-	error_check_mutex(data, pthread_mutex_init(&data->start_flag_mutex, NULL));
-	error_check_mutex(data, pthread_mutex_init(&data->check_meal_mutex, NULL));
-	error_check_mutex(data, pthread_mutex_init(&data->print_mutex, NULL));
-	error_check_mutex(data, pthread_mutex_init(&data->must_meal_mutex, NULL));
-	error_check_mutex(data, pthread_mutex_init(&data->meal_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->death_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->start_flag_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->check_meal_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->print_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->must_meal_mutex, NULL));
+	handle_mutex_error(data, pthread_mutex_init(&data->meal_mutex, NULL));
 	data->forks = ft_calloc(data->philo_count, sizeof(pthread_mutex_t));
-	error_check(data, ERR_MALLOC_FAIL, data->forks);
+	handle_error(data, ERR_MALLOC_FAIL, data->forks);
 	while (++i < data->philo_count)
 	{
-		error_check_mutex(data, pthread_mutex_init(&data->forks[i],
+		handle_mutex_error(data, pthread_mutex_init(&data->forks[i],
 				NULL));
-		error_check_mutex(data, pthread_mutex_init(&data->philos[i].eat_count_mutex,
+		handle_mutex_error(data, pthread_mutex_init(&data->philos[i].eat_count_mutex,
 				NULL));
 	}
 	i = -1;

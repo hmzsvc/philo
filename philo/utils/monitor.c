@@ -3,21 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/07 12:07:47 by huozturk          #+#    #+#             */
-/*   Updated: 2025/07/31 19:52:08 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:00 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 22:08:45 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../lib/philo.h"
 
-static void	*monitor_process(void *argv)
+#include "../lib/philo.h"
+//utilys ve monitoru birleştir ve uygun değişimleri yap 
+static void	*watch_for_death(void *argv)
 {
-	t_data	*datas;
+	t_table	*datas;
 	int		i;
 
-	datas = (t_data *)argv;
+	datas = (t_table *)argv;
 	wait_start(datas);
 	while (1)
 	{
@@ -26,7 +27,7 @@ static void	*monitor_process(void *argv)
 		{
 			check_and_handle_death(datas, i);
 			pthread_mutex_lock(&datas->must_meal_mutex);
-			if (datas->must_eat != -1 && (datas->must_meal_num >= datas->philo_count))
+			if (datas->must_eat != -1 && (datas->must_meal_loop >= datas->philo_count))
 			{
 				datas->is_dead = 3;
 				pthread_mutex_unlock(&datas->must_meal_mutex);
@@ -37,13 +38,13 @@ static void	*monitor_process(void *argv)
 	}
 }
 
-void	monitor_philo_create(t_data *data)
+void	setup_philosopher_monitor(t_table *data)
 {
 	if (pthread_create(
 		&data->monitor_philo,
 		NULL,
-		monitor_process,
-		&*data))
+		watch_for_death,
+		&*data) != 0)
 	{
 		data->start_flag = 1;
 		data->is_dead = 2;

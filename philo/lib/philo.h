@@ -5,21 +5,23 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/17 17:46:30 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/02 14:50:35 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:37 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 22:08:45 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #ifndef PHILO_H
 # define PHILO_H
 
 # include <pthread.h>
 
-typedef struct s_data	t_data;
+typedef struct s_table	t_table;
 
 typedef struct s_philo
 {
-	int				id;
+	int				identity;
 	int				left_fork_bool;
 	int				right_fork_bool;
 	int				eat_count;
@@ -28,10 +30,10 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	eat_count_mutex;
-	t_data			*data;
+	t_table			*data;
 }	t_philo;
 
-typedef struct s_data
+typedef struct s_table
 {
 	int				philo_count;
 	int				dead_index;
@@ -41,7 +43,7 @@ typedef struct s_data
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				start_flag;
-	int				must_meal_num;
+	int				must_meal_loop;
 	long long		start_time;
 	long long		last_meal_philo;
 	pthread_t		monitor_philo;
@@ -53,16 +55,16 @@ typedef struct s_data
 	pthread_mutex_t	meal_mutex;
 	pthread_mutex_t	must_meal_mutex;
 	t_philo			*philos;
-}	t_data;
+}	t_table;
 
 int			ft_atoi(char *str, int *res);
-void		init_philo(t_data *data, char *argv[], int argc);
-void		init_forks(t_data *data);
-void		create_philo(t_data *data);
-void		error_check(t_data *data, int err_code, void *ptr);
-void		cleanup(t_data *data);
+void		initialize_table(t_table *data, char *argv[], int argc);
+void		initialize_forks(t_table *data);
+void		create_philo(t_table *data);
+void		handle_error(t_table *data, int err_code, void *ptr);
+void		reset_table(t_table *data);
 long long	get_time_in_ms(void);
-void		monitor_philo_create(t_data *data);
+void		setup_philosopher_monitor(t_table *data);
 int			check_dead(t_philo *philo);
 int			check_start_flag(t_philo *philo);
 void		handle_dead(t_philo *philo);
@@ -72,17 +74,17 @@ void		philo_thinking(t_philo *philo);
 void		philo_dead(t_philo philo);
 void		last_meal_added(t_philo *philo);
 void		sync_philo_start(t_philo *philo);
-void		parse_args(char *argv[], t_data *data, int argc);
+void		parse_args(char *argv[], t_table *data, int argc);
 void		check_meal_goal(t_philo *philo);
 void		philo_take_fork(t_philo *philo);
 void		print(t_philo *philo, char *str);
-void		philo_join(t_data *data);
+void		philo_join(t_table *data);
 void		*ft_calloc(size_t count, size_t size);
-void		error_check_mutex(t_data *data, int value);
-void		check_and_handle_death(t_data *data, int philo_index);
-void		set_time(t_data *data);
+void		handle_mutex_error(t_table *data, int value);
+void		check_and_handle_death(t_table *data, int philo_index);
+void		set_time(t_table *data);
 void		ft_usleep(int wait_time, t_philo *philo);
-void		wait_start(t_data *data);
+void		wait_start(t_table *data);
 
 
 #endif

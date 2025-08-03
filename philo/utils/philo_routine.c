@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   philo_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/07 12:07:58 by huozturk          #+#    #+#             */
-/*   Updated: 2025/07/31 19:52:46 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:08 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/02 21:00:20 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 #include <stdio.h>
@@ -41,13 +43,13 @@ void	philo_dead(t_philo philo)
 	pthread_mutex_lock(&philo.data->print_mutex);
 	usleep(50);
 	printf("%lld %d died\n", get_time_in_ms() - philo.data->start_time,
-		philo.id);
+		philo.identity);
 	pthread_mutex_unlock(&philo.data->print_mutex);
 }
 
 void	philo_take_fork(t_philo *philo)
 {
-	if (philo->id % 2 == 0)
+	if (philo->identity % 2 == 0)
 	{
 		pthread_mutex_lock(philo->left_fork);
 		philo->left_fork_bool = 1;

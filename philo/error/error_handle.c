@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   error_handle.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 19:46:19 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/01 19:28:28 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:31 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 20:07:56 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 #include "../lib/error.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-static void	destroy_mutex(t_data *data)
+static void	destroy_mutex(t_table *data)
 {
 	int	i;
 
@@ -35,7 +37,7 @@ static void	destroy_mutex(t_data *data)
 	}
 }
 
-void	cleanup(t_data *data)
+void	reset_table(t_table *data)
 {
 	destroy_mutex(data);
 	if (data->philos)
@@ -44,9 +46,9 @@ void	cleanup(t_data *data)
 		free(data->forks);
 }
 
-void	error_check(t_data *data, int err_code, void *ptr)
+void	handle_error(t_table *data, int err_code, void *str)
 {
-	if (ptr)
+	if (str)
 		return ;
 	if (err_code == ERR_MALLOC_FAIL)
 		printf("ERR_MALLOC_FAIL\n");
@@ -57,17 +59,17 @@ void	error_check(t_data *data, int err_code, void *ptr)
 	else if (err_code == ERR_ATOI_FAIL)
 		printf("ERR_ATOI_FAIL\n");
 	if (data)
-		cleanup(data);
+		reset_table(data);
 	exit(1);
 }
 
-void	error_check_mutex(t_data *data, int value)
+void	handle_mutex_error(t_table *data, int value)
 {
 	if (value == 0)
 		return ;
 	if (value != 0)
 		printf("ERR_MUTEX_FAIL\n");
 	if (data)
-		cleanup(data);
+		reset_table(data);
 	exit(1);
 }

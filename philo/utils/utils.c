@@ -5,10 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/07 12:08:03 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/02 14:50:35 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:16 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 19:52:00 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 #include "../lib/error.h"
@@ -34,22 +36,22 @@ int	ft_atoi(char *str, int *res)
 	*res = 0;
 	i = 0;
 	if (check_long(str))
-		error_check(NULL, ERR_ATOI_FAIL, NULL);
+		handle_error(NULL, ERR_ATOI_FAIL, NULL);
 	while (*(str + i) == '+' || *(str + i) == '-')
 	{
 		if (*(str + i++) == '-')
-			error_check(NULL, ERR_ATOI_FAIL, NULL);
+			handle_error(NULL, ERR_ATOI_FAIL, NULL);
 	}
 	while ((*(str + i) >= '0' && *(str + i) <= '9') || *(str + i) != '\0')
 	{
 		if (!(*(str + i) >= '0' && *(str + i) <= '9'))
-			error_check(NULL, ERR_ATOI_FAIL, NULL);
+			handle_error(NULL, ERR_ATOI_FAIL, NULL);
 		else
 			*res = (*res * 10) + (*(str + i) - '0');
 		i++;
 	}
 	if (*res > 2147483647)
-		error_check(NULL, ERR_ATOI_FAIL, NULL);
+		handle_error(NULL, ERR_ATOI_FAIL, NULL);
 	return (0);
 }
 
@@ -58,11 +60,11 @@ void	sync_philo_start(t_philo *philo)
 	pthread_mutex_lock(&philo->data->meal_mutex);
 	philo->last_meal_time = get_time_in_ms();
 	pthread_mutex_unlock(&philo->data->meal_mutex);
-	if (philo->id % 2 != 0)
+	if (philo->identity % 2 != 0)
 		ft_usleep(philo->data->time_to_eat, philo);
 }
 
-void	parse_args(char *argv[], t_data *data, int argc)
+void	parse_args(char *argv[], t_table *data, int argc)
 {
 	if (argc == 5)
 	{
@@ -70,7 +72,7 @@ void	parse_args(char *argv[], t_data *data, int argc)
 			|| ft_atoi(argv[2], &data->time_to_die)
 			|| ft_atoi(argv[3], &data->time_to_eat)
 			|| ft_atoi(argv[4], &data->time_to_sleep))
-			error_check(data, ERR_INVALID_ARG, NULL);
+			handle_error(data, ERR_INVALID_ARG, NULL);
 		data->must_eat = -1;
 	}
 	else
@@ -80,7 +82,7 @@ void	parse_args(char *argv[], t_data *data, int argc)
 			|| ft_atoi(argv[3], &data->time_to_eat)
 			|| ft_atoi(argv[4], &data->time_to_sleep)
 			|| ft_atoi(argv[5], &data->must_eat))
-			error_check(data, ERR_INVALID_ARG, NULL);
+			handle_error(data, ERR_INVALID_ARG, NULL);
 	}
 }
 
@@ -92,7 +94,7 @@ void	print(t_philo *philo, char *str)
 	if (!check_dead(philo))
 	{
 		printf("%lld %d %s\n", get_time_in_ms() - philo->data->start_time,
-			philo->id, str);
+			philo->identity, str);
 	}
 	
 	pthread_mutex_unlock(&philo->data->print_mutex);

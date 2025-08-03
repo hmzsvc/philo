@@ -5,10 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/07 12:07:55 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/02 14:50:35 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/02 20:55:04 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 22:49:09 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 
@@ -57,10 +59,8 @@ void	check_meal_goal(t_philo *philo)
 	if (philo->eat_count == philo->data->must_eat)
 	{
 		pthread_mutex_lock(&philo->data->must_meal_mutex);
-		philo->data->must_meal_num++;
+		philo->data->must_meal_loop++;
 		pthread_mutex_unlock(&philo->data->must_meal_mutex);
-
-		
 		pthread_mutex_unlock(&philo->data->check_meal_mutex);
 		if (philo->left_fork_bool)
 			pthread_mutex_unlock(philo->left_fork);

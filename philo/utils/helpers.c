@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   helpers.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:30:32 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/01 19:52:37 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 17:46:55 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "../lib/philo.h"
 #include <stdlib.h>
 #include <sys/time.h>
 
-void	philo_join(t_data *data)
+void	philo_join(t_table *data)
 {
 	int	i;
 
@@ -70,7 +72,7 @@ long long	get_time_in_ms(void)
 	return ((tv.tv_sec * 1000LL) + (tv.tv_usec / 1000));
 }
 
-void	set_time(t_data *data)
+void	set_time(t_table *data)
 {
 	data->start_time = get_time_in_ms();
 }

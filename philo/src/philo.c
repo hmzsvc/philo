@@ -3,18 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: huozturk <huozturk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/17 17:46:28 by huozturk          #+#    #+#             */
-/*   Updated: 2025/08/01 18:23:28 by huozturk         ###   ########.fr       */
+/*   Created: 2025/08/02 20:54:41 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/03 20:21:14 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../lib/philo.h"
 #include <stdio.h>
 #include <unistd.h>
 
-void	ft_usleep(int wait_time, t_philo *philo)
+void	ft_usleep(int wait_time, t_philo *philo) // neden ft_usleep?
 {
 	unsigned long long	time;
 
@@ -28,16 +29,16 @@ void	ft_usleep(int wait_time, t_philo *philo)
 
 int	main(int argc, char *argv[])
 {
-	t_data	data;
+	t_table	data;
 
 	if (argc == 5 || argc == 6)
 	{
-		init_philo(&data, argv, argc);
-		init_forks(&data);
-		monitor_philo_create(&data);
+		initialize_table(&data, argv, argc);
+		initialize_forks(&data);
+		setup_philosopher_monitor(&data);
 		create_philo(&data);
 		philo_join(&data);
-		cleanup(&data);
+		reset_table(&data);
 		return (0);
 	}
 	else
