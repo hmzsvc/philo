@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 17:46:55 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/03 23:39:14 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	philo_join(t_table *data)
 	if (data->dead_index != -1)
 		philo_dead(data->philos[data->dead_index]);	
 	else if (data->philo_count == 1 && data->is_dead == 1)
-		philo_dead(data->philos[0]);	
+		philo_dead(data->philos[0]);
 	while (++i < data->philo_count)
 	{
 		pthread_join(

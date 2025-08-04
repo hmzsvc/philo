@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 22:08:45 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/03 23:39:25 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,23 @@ static void	*philo_process(void *arg)
 	sync_philo_start(philo);
 	while (!check_dead(philo))
 	{
+		if (philo->data->must_eat != -1 && check_meal_goal(philo))
+			break;
+		if (handle_dead(philo))
+			break;
 		philo_take_fork(philo);
 		philo_eat(philo);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		philo->left_fork_bool = 0;
 		philo->right_fork_bool = 0;
+		if (philo->data->must_eat != -1 && check_meal_goal(philo))
+			break;
+		if (handle_dead(philo))
+			break;
 		philo_sleep(philo);
+		if (handle_dead(philo))
+			break;
 		philo_thinking(philo);
 	}
 
