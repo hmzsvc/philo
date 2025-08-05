@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:16 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 19:52:00 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/05 21:13:41 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	check_long(char *str)
 	return (0);
 }
 
-int	ft_atoi(char *str, int *res)
+static int	ft_atoi(char *str, int *res)
 {
 	int	i;
 

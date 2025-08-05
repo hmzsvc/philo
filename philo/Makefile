@@ -10,7 +10,6 @@ RM					= rm -rf
 
 PHILO_SRCS			=	$(SRC_DIR)philo.c \
 							$(UTL_DIR)monitor.c \
-							$(UTL_DIR)monitor_utils.c \
 							$(UTL_DIR)utils.c \
 							$(UTL_DIR)helpers.c \
 							$(UTL_DIR)philo_utils.c \
@@ -32,7 +31,6 @@ $(NAME): 			$(OBJ)
 					@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 					@echo "\n\e[1m$(COLOR_YELLOW)$(NAME)	$(COLOR_GREEN)[is ready!]\e[0m\n$(COLOR_END)"
 
-# Pattern rules for each directory
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 					@mkdir -p $(OBJ_DIR)
 					@$(CC) $(CFLAGS) -c $< -o $@

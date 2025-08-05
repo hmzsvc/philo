@@ -27,6 +27,7 @@ void	*toplama(void *hüso)
     usleep(1); 
 	data = (t_bank *)hüso;
 	data->cuurent_bank -= data->money;
+    pthread_mutex_lock(data->cuurent_bank);
 	printf("işlemi yapan: %d banka sonucu: %d\n", data->philo->id, data->cuurent_bank);
     
 }
@@ -40,15 +41,18 @@ int	main(void)
     t_philo filo;
     banker.philo = &filo;
 
-    i = -1;
-	while (++i < 5)
-	{
-        filo.id = i;
-		pthread_create(&filo.threads[i], NULL, toplama, &banker);
-        pthread_mutex_lock()
-        pthread_join(filo.threads[i], NULL);
+    // i = -1;
+	// while (++i < 5)
+	// {
+    //     filo.id = i;
+    //     pthread_mutex_lock()
         
-	}
+	// }
+    pthread_create(&filo.threads[0], NULL, toplama, &banker);
+    pthread_create(&filo.threads[1], NULL, toplama, &banker);
+    pthread_join(filo.threads[0], NULL);
+    pthread_join(filo.threads[1], NULL);
+
     // i = -1;
     // while (++i < 5)
     // {
