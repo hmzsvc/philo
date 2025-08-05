@@ -6,14 +6,12 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 23:39:25 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/05 17:10:05 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
-#include "../lib/philo.h"
 #include "../lib/error.h"
+#include "../lib/philo.h"
 #include <unistd.h>
 
 static void	one_philo_handle(t_philo *philo)
@@ -45,25 +43,26 @@ static void	*philo_process(void *arg)
 	while (!check_dead(philo))
 	{
 		if (philo->data->must_eat != -1 && check_meal_goal(philo))
-			break;
+			break ;
 		if (handle_dead(philo))
-			break;
+			break ;
 		philo_take_fork(philo);
 		philo_eat(philo);
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
-		philo->left_fork_bool = 0;
+		if (philo->right_fork_bool)
+			pthread_mutex_unlock(philo->right_fork);
 		philo->right_fork_bool = 0;
+		if (philo->left_fork_bool)
+			pthread_mutex_unlock(philo->left_fork);
+		philo->left_fork_bool = 0;
 		if (philo->data->must_eat != -1 && check_meal_goal(philo))
-			break;
+			break ;
 		if (handle_dead(philo))
-			break;
+			break ;
 		philo_sleep(philo);
 		if (handle_dead(philo))
-			break;
+			break ;
 		philo_thinking(philo);
 	}
-
 	return (NULL);
 }
 
@@ -101,10 +100,7 @@ void	create_philo(t_table *data)
 	i = -1;
 	while (++i < data->philo_count)
 	{
-		if (pthread_create(
-				&data->philos[i].thread,
-				NULL,
-				philo_process,
+		if (pthread_create(&data->philos[i].thread, NULL, philo_process,
 				&data->philos[i]))
 		{
 			pthread_mutex_lock(&data->start_flag_mutex);
@@ -113,7 +109,7 @@ void	create_philo(t_table *data)
 			pthread_mutex_lock(&data->death_mutex);
 			data->is_dead = 2;
 			pthread_mutex_unlock(&data->death_mutex);
-			break;
+			break ;
 		}
 	}
 	set_time(data);
@@ -137,10 +133,9 @@ void	initialize_forks(t_table *data)
 	handle_error(data, ERR_MALLOC_FAIL, data->forks);
 	while (++i < data->philo_count)
 	{
-		handle_mutex_error(data, pthread_mutex_init(&data->forks[i],
-				NULL));
-		handle_mutex_error(data, pthread_mutex_init(&data->philos[i].eat_count_mutex,
-				NULL));
+		handle_mutex_error(data, pthread_mutex_init(&data->forks[i], NULL));
+		handle_mutex_error(data,
+			pthread_mutex_init(&data->philos[i].eat_count_mutex, NULL));
 	}
 	i = -1;
 	while (++i < data->philo_count)

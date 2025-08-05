@@ -5,7 +5,7 @@ SRC_DIR				= src/
 UTL_DIR				= utils/
 ERR_DIR				= error/
 CC					= @cc
-CFLAGS				= -Wall -Wextra -Werror -pthread #-fsanitize=thread -g
+CFLAGS				= -Wall -Wextra -Werror -pthread -fsanitize=thread -g
 RM					= rm -rf
 
 PHILO_SRCS			=	$(SRC_DIR)philo.c \

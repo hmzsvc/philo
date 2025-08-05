@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:04 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/04 00:10:25 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/05 17:51:58 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,15 @@ int	handle_dead(t_philo *philo)
 	{
 		pthread_mutex_unlock(&philo->data->death_mutex);
 		if (philo->right_fork_bool)
+		{
 			pthread_mutex_unlock(philo->right_fork);
+			philo->right_fork_bool = 0;
+		}
 		if (philo->left_fork_bool)
+		{
 			pthread_mutex_unlock(philo->left_fork);
-		philo->right_fork_bool = 0;
-		philo->left_fork_bool = 0;
+			philo->left_fork_bool = 0;
+		}	
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->data->death_mutex);
