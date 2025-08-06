@@ -1,21 +1,18 @@
-MAKEFLAGS 			+= --no-print-directory # -fsanitize=address -g
 NAME				= philo
 OBJ_DIR				= obj/
 SRC_DIR				= src/
-UTL_DIR				= utils/
-ERR_DIR				= error/
 CC					= @cc
 CFLAGS				= -Wall -Wextra -Werror -pthread -fsanitize=thread -g
 RM					= rm -rf
 
 PHILO_SRCS			=	$(SRC_DIR)philo.c \
-							$(UTL_DIR)monitor.c \
-							$(UTL_DIR)support.c \
-							$(UTL_DIR)helpers.c \
-							$(UTL_DIR)philo_utils.c \
-							$(UTL_DIR)mutex.c \
-							$(UTL_DIR)mandotary.c \
-							$(ERR_DIR)error_handle.c \
+							$(SRC_DIR)monitor.c \
+							$(SRC_DIR)support.c \
+							$(SRC_DIR)helpers.c \
+							$(SRC_DIR)philo_utils.c \
+							$(SRC_DIR)mutex.c \
+							$(SRC_DIR)mandotary.c \
+							$(SRC_DIR)error_handle.c \
 
 SRCS 				= $(PHILO_SRCS)
 OBJ					= $(addprefix $(OBJ_DIR), $(notdir $(SRCS:.c=.o)))

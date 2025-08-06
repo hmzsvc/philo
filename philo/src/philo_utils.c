@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 14:14:13 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:46:25 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,8 @@
 #include "../lib/philo.h"
 #include <unistd.h>
 
-static void	one_philo_handle(t_philo *philo)
+static void	run_philo_loop(t_philo *philo)
 {
-	if (philo->data->philo_count == 1)
-	{
-		pthread_mutex_lock(philo->left_fork);
-		print(philo, "has taken a fork");
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_lock(&philo->data->death_mutex);
-		philo->data->is_dead = 1;
-		pthread_mutex_unlock(&philo->data->death_mutex);
-	}
-}
-
-static void	*philo_process(void *arg)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)arg;
-	while (1)
-	{
-		if (check_start_flag(philo))
-			break ;
-		usleep(100);
-	}
-	one_philo_handle(philo);
-	sync_philo_start(philo);
 	while (!check_dead(philo))
 	{
 		if (philo->data->must_eat != -1 && check_meal_goal(philo))
@@ -63,6 +39,22 @@ static void	*philo_process(void *arg)
 			break ;
 		philo_thinking(philo);
 	}
+}
+
+static void	*philo_process(void *arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	while (1)
+	{
+		if (check_start_flag(philo))
+			break ;
+		usleep(100);
+	}
+	one_philo_handle(philo);
+	sync_philo_start(philo);
+	run_philo_loop(philo);
 	return (NULL);
 }
 

@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:37 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 12:48:45 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:46:07 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef struct s_table
 	t_philo				*philos;
 }						t_table;
 
-// int			ft_atoi(char *str, int *res);
+void					one_philo_handle(t_philo *philo);
 void					initialize_table(t_table *data, char *argv[], int argc);
 void					initialize_forks(t_table *data);
 void					create_philo(t_table *data);
@@ -79,9 +79,6 @@ void					print(t_philo *philo, char *str);
 void					philo_join(t_table *data);
 void					*ft_calloc(size_t count, size_t size);
 void					handle_mutex_error(t_table *data, int value);
-// int			check_and_handle_death(t_table *data, int philo_index);
 void					set_time(t_table *data);
 void					ft_usleep(int wait_time, t_philo *philo);
-// void		wait_start(t_table *data);
-
 #endif
