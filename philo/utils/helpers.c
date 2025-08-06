@@ -6,11 +6,9 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 23:39:14 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:13:11 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "../lib/philo.h"
 #include <stdlib.h>
@@ -21,19 +19,14 @@ void	philo_join(t_table *data)
 	int	i;
 
 	i = -1;
-	
-	pthread_join(
-		data->monitor_philo,
-		NULL);
+	pthread_join(data->monitor_philo, NULL);
 	if (data->dead_index != -1)
-		philo_dead(data->philos[data->dead_index]);	
+		philo_dead(data->philos[data->dead_index]);
 	else if (data->philo_count == 1 && data->is_dead == 1)
 		philo_dead(data->philos[0]);
 	while (++i < data->philo_count)
 	{
-		pthread_join(
-			data->philos[i].thread,
-			NULL);
+		pthread_join(data->philos[i].thread, NULL);
 	}
 }
 

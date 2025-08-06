@@ -6,23 +6,22 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:00 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/05 22:52:12 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:13:44 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../lib/philo.h"
-//utilys ve monitoru birleştir ve uygun değişimleri yap 
+
 static void	begin_wait(t_table *data)
 {
 	while (1)
 	{
 		pthread_mutex_lock(&data->start_flag_mutex);
-			if (data->start_flag == 1)
-			{
-				pthread_mutex_unlock(&data->start_flag_mutex);	
-				break ;
-			}
+		if (data->start_flag == 1)
+		{
+			pthread_mutex_unlock(&data->start_flag_mutex);
+			break ;
+		}
 		pthread_mutex_unlock(&data->start_flag_mutex);
 	}
 }
@@ -50,7 +49,6 @@ static int	check_and_handle_death(t_table *data, int philo_index)
 	return (0);
 }
 
-
 static void	*watch_for_death(void *argv)
 {
 	t_table	*datas;
@@ -66,25 +64,22 @@ static void	*watch_for_death(void *argv)
 			if (check_and_handle_death(datas, i))
 				return (NULL);
 			pthread_mutex_lock(&datas->must_meal_mutex);
-			if (datas->must_eat != -1 && (datas->must_meal_loop >= datas->philo_count))
+			if (datas->must_eat != -1
+				&& (datas->must_meal_loop >= datas->philo_count))
 			{
 				datas->is_dead = 3;
 				pthread_mutex_unlock(&datas->must_meal_mutex);
-				return(NULL);
+				return (NULL);
 			}
 			pthread_mutex_unlock(&datas->must_meal_mutex);
 		}
 	}
 }
 
-
 void	setup_philosopher_monitor(t_table *data)
 {
-	if (pthread_create(
-		&data->monitor_philo,
-		NULL,
-		watch_for_death,
-		&*data) != 0)
+	if (pthread_create(&data->monitor_philo, NULL, watch_for_death,
+			&*data) != 0)
 	{
 		data->start_flag = 1;
 		data->is_dead = 2;

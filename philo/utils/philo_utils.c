@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/05 17:10:05 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:14:13 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ static void	*philo_process(void *arg)
 		if (philo->left_fork_bool)
 			pthread_mutex_unlock(philo->left_fork);
 		philo->left_fork_bool = 0;
-		if (philo->data->must_eat != -1 && check_meal_goal(philo))
-			break ;
 		if (handle_dead(philo))
+			break ;
+		if (philo->data->must_eat != -1 && check_meal_goal(philo))
 			break ;
 		philo_sleep(philo);
 		if (handle_dead(philo))
@@ -93,6 +93,7 @@ void	initialize_table(t_table *data, char *argv[], int argc)
 	if ((data->philo_count != data->philos[i - 1].identity))
 		handle_error(data, ERR_THREAD_FAIL, NULL);
 }
+
 void	create_philo(t_table *data)
 {
 	int	i;

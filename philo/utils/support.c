@@ -1,21 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   support.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/02 20:55:16 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/05 21:13:41 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/06 12:42:37 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/06 12:48:08 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
-#include "../lib/philo.h"
 #include "../lib/error.h"
+#include "../lib/philo.h"
 #include <stdio.h>
-
 
 static int	check_long(char *str)
 {
@@ -68,20 +65,18 @@ void	parse_args(char *argv[], t_table *data, int argc)
 {
 	if (argc == 5)
 	{
-		if (ft_atoi(argv[1], &data->philo_count)
-			|| ft_atoi(argv[2], &data->time_to_die)
-			|| ft_atoi(argv[3], &data->time_to_eat)
+		if (ft_atoi(argv[1], &data->philo_count) || ft_atoi(argv[2],
+				&data->time_to_die) || ft_atoi(argv[3], &data->time_to_eat)
 			|| ft_atoi(argv[4], &data->time_to_sleep))
 			handle_error(data, ERR_INVALID_ARG, NULL);
 		data->must_eat = -1;
 	}
 	else
 	{
-		if (ft_atoi(argv[1], &data->philo_count)
-			|| ft_atoi(argv[2], &data->time_to_die)
-			|| ft_atoi(argv[3], &data->time_to_eat)
-			|| ft_atoi(argv[4], &data->time_to_sleep)
-			|| ft_atoi(argv[5], &data->must_eat))
+		if (ft_atoi(argv[1], &data->philo_count) || ft_atoi(argv[2],
+				&data->time_to_die) || ft_atoi(argv[3], &data->time_to_eat)
+			|| ft_atoi(argv[4], &data->time_to_sleep) || ft_atoi(argv[5],
+				&data->must_eat))
 			handle_error(data, ERR_INVALID_ARG, NULL);
 	}
 }
@@ -96,6 +91,5 @@ void	print(t_philo *philo, char *str)
 		printf("%lld %d %s\n", get_time_in_ms() - philo->data->start_time,
 			philo->identity, str);
 	}
-	
 	pthread_mutex_unlock(&philo->data->print_mutex);
 }

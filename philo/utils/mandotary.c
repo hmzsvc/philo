@@ -1,16 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_routine.c                                    :+:      :+:    :+:   */
+/*   mandotary.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/02 20:55:08 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/02 21:00:20 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/06 12:42:28 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/06 12:48:33 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "../lib/philo.h"
 #include <stdio.h>
@@ -35,7 +33,8 @@ void	philo_sleep(t_philo *philo)
 void	philo_thinking(t_philo *philo)
 {
 	print(philo, "is thinking");
-	usleep(philo->data->time_to_die - (philo->data->time_to_eat + philo->data->time_to_sleep)); // BAKILACAK KONTROL ET!
+	usleep(philo->data->time_to_die - (philo->data->time_to_eat
+			+ philo->data->time_to_sleep)); // BAKILACAK KONTROL ET!
 }
 
 void	philo_dead(t_philo philo)

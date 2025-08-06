@@ -10,11 +10,11 @@ RM					= rm -rf
 
 PHILO_SRCS			=	$(SRC_DIR)philo.c \
 							$(UTL_DIR)monitor.c \
-							$(UTL_DIR)utils.c \
+							$(UTL_DIR)support.c \
 							$(UTL_DIR)helpers.c \
 							$(UTL_DIR)philo_utils.c \
-							$(UTL_DIR)mutex_utils.c \
-							$(UTL_DIR)philo_routine.c \
+							$(UTL_DIR)mutex.c \
+							$(UTL_DIR)mandotary.c \
 							$(ERR_DIR)error_handle.c \
 
 SRCS 				= $(PHILO_SRCS)

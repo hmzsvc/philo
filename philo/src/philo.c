@@ -6,10 +6,9 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:41 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 20:21:14 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:12:45 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../lib/philo.h"
 #include <stdio.h>

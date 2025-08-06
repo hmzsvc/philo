@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mutex_utils.c                                      :+:      :+:    :+:   */
+/*   mutex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/02 20:55:04 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/05 17:51:58 by hasivaci         ###   ########.fr       */
+/*   Created: 2025/08/06 12:47:52 by hasivaci          #+#    #+#             */
+/*   Updated: 2025/08/06 12:48:19 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #include "../lib/philo.h"
 
 int	check_dead(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->death_mutex);
-	if (philo->data->is_dead == 1 || philo->data->is_dead == 2 || philo->data->is_dead == 3)
+	if (philo->data->is_dead == 1 || philo->data->is_dead == 2
+		|| philo->data->is_dead == 3)
 	{
 		pthread_mutex_unlock(&philo->data->death_mutex);
 		return (1);
@@ -53,7 +52,7 @@ int	handle_dead(t_philo *philo)
 		{
 			pthread_mutex_unlock(philo->left_fork);
 			philo->left_fork_bool = 0;
-		}	
+		}
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->data->death_mutex);

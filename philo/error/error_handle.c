@@ -6,16 +6,14 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:31 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/03 20:07:56 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:11:31 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
-#include "../lib/philo.h"
 #include "../lib/error.h"
-#include <stdlib.h>
+#include "../lib/philo.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static void	destroy_mutex(t_table *data)
 {
@@ -26,7 +24,6 @@ static void	destroy_mutex(t_table *data)
 	pthread_mutex_destroy(&data->death_mutex);
 	pthread_mutex_destroy(&data->print_mutex);
 	pthread_mutex_destroy(&data->start_flag_mutex);
-
 	i = -1;
 	if (data->forks)
 	{
