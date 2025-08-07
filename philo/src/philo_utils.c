@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 14:45:58 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 17:12:09 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,20 @@
 #include "../lib/philo.h"
 #include <unistd.h>
 
+static int	check_finish(t_philo *philo)
+{
+	if (philo->data->must_eat != -1 && check_meal_goal(philo))
+		return (1);
+	if (handle_dead(philo))
+		return (1);
+	return (0);
+}
+
 static void	run_philo_loop(t_philo *philo)
 {
 	while (!check_dead(philo))
 	{
-		if (philo->data->must_eat != -1 && check_meal_goal(philo))
-			break ;
-		if (handle_dead(philo))
+		if (check_finish(philo))
 			break ;
 		philo_take_fork(philo);
 		philo_eat(philo);
@@ -30,9 +37,7 @@ static void	run_philo_loop(t_philo *philo)
 		if (philo->left_fork_bool)
 			pthread_mutex_unlock(philo->left_fork);
 		philo->left_fork_bool = 0;
-		if (handle_dead(philo))
-			break ;
-		if (philo->data->must_eat != -1 && check_meal_goal(philo))
+		if (check_finish(philo))
 			break ;
 		philo_sleep(philo);
 		if (handle_dead(philo))
@@ -57,34 +62,12 @@ static void	*philo_process(void *arg)
 	run_philo_loop(philo);
 	return (NULL);
 }
-
-// void	initialize_table(t_table *data, char *argv[], int argc)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	parse_args(argv, data, argc);
-// 	data->forks = NULL;
-// 	data->philos = NULL;
-// 	data->is_dead = 0;
-// 	data->dead_index = -1;
-// 	data->start_flag = 0;
-// 	data->must_meal_loop = 0;
-// 	data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
-// 	handle_error(data, ERR_MALLOC_FAIL, data->philos);
-// 	while (i < data->philo_count)
-// 	{
-// 		data->philos[i].identity = i + 1;
-// 		data->philos[i].data = data;
-// 		data->philos[i].last_meal_time = get_time();
-// 		data->philos[i].eat_count = 0;
-// 		data->philos[i].left_fork_bool = 0;
-// 		data->philos[i].right_fork_bool = 0;
-// 		i++;
-// 	}
-// 	if ((data->philo_count != data->philos[i - 1].identity))
-// 		handle_error(data, ERR_THREAD_FAIL, NULL);
-// }
+static void	set_start_flag(t_table *data)
+{
+	pthread_mutex_lock(&data->start_flag_mutex);
+	data->start_flag = 1;
+	pthread_mutex_unlock(&data->start_flag_mutex);
+}
 
 void	create_philo(t_table *data)
 {
@@ -96,9 +79,7 @@ void	create_philo(t_table *data)
 		if (pthread_create(&data->philos[i].thread, NULL, philo_process,
 				&data->philos[i]))
 		{
-			pthread_mutex_lock(&data->start_flag_mutex);
-			data->start_flag = 1;
-			pthread_mutex_unlock(&data->start_flag_mutex);
+			set_start_flag(data);
 			pthread_mutex_lock(&data->death_mutex);
 			data->is_dead = 2;
 			pthread_mutex_unlock(&data->death_mutex);
@@ -106,34 +87,5 @@ void	create_philo(t_table *data)
 		}
 	}
 	set_time(data);
-	pthread_mutex_lock(&data->start_flag_mutex);
-	data->start_flag = 1;
-	pthread_mutex_unlock(&data->start_flag_mutex);
-}
-
-void	initialize_forks(t_table *data)
-{
-	int	i;
-
-	i = -1;
-	handle_mutex_error(data, pthread_mutex_init(&data->death_mutex, NULL));
-	handle_mutex_error(data, pthread_mutex_init(&data->start_flag_mutex, NULL));
-	handle_mutex_error(data, pthread_mutex_init(&data->check_meal_mutex, NULL));
-	handle_mutex_error(data, pthread_mutex_init(&data->print_mutex, NULL));
-	handle_mutex_error(data, pthread_mutex_init(&data->must_meal_mutex, NULL));
-	handle_mutex_error(data, pthread_mutex_init(&data->meal_mutex, NULL));
-	data->forks = ft_calloc(data->philo_count, sizeof(pthread_mutex_t));
-	handle_error(data, ERR_MALLOC_FAIL, data->forks);
-	while (++i < data->philo_count)
-	{
-		handle_mutex_error(data, pthread_mutex_init(&data->forks[i], NULL));
-		handle_mutex_error(data,
-			pthread_mutex_init(&data->philos[i].eat_count_mutex, NULL));
-	}
-	i = -1;
-	while (++i < data->philo_count)
-	{
-		data->philos[i].left_fork = &data->forks[i];
-		data->philos[i].right_fork = &data->forks[(i + 1) % data->philo_count];
-	}
+	set_start_flag(data);
 }

@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:37 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 14:47:53 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 17:47:55 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,6 @@ typedef struct s_table
 }						t_table;
 
 void					single_philo_operation(t_philo *philo);
-// void					initialize_table(t_table *data, char *argv[], int argc);
-void					initialize_forks(t_table *data);
 void					create_philo(t_table *data);
 void					handle_error(t_table *data, int err_code, void *ptr);
 void					reset_table(t_table *data);

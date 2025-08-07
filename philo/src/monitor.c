@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:00 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 22:29:10 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,8 @@ static void	begin_wait(t_table *data)
 {
 	while (1)
 	{
-		pthread_mutex_lock(&data->start_flag_mutex);
-		if (data->start_flag == 1)
-		{
-			pthread_mutex_unlock(&data->start_flag_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&data->start_flag_mutex);
+		if (check_start_flag(data->philos)) 
+			break;
 	}
 }
 
