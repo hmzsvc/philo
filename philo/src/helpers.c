@@ -6,13 +6,14 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 14:13:11 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 12:00:29 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lib/philo.h"
 #include <stdlib.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 void	philo_join(t_table *data)
 {
@@ -29,31 +30,36 @@ void	philo_join(t_table *data)
 		pthread_join(data->philos[i].thread, NULL);
 	}
 }
-
-static void	*ft_memset(void *b, int c, size_t len)
+void	ft_usleep(int wait_time, t_philo *philo) // neden ft_usleep?
 {
-	unsigned char	*str;
+	unsigned long long time;
 
-	str = (unsigned char *)b;
-	while (len > 0)
+	time = get_time_in_ms();
+	while (get_time_in_ms() - time < (unsigned long long)wait_time)
 	{
-		*str = (unsigned char)c;
-		len--;
-		str++;
+		handle_dead(philo);
+		usleep(100);
 	}
-	return (b);
 }
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	void	*memory;
+	void			*memory;
+	unsigned char	*ptr;
+	size_t			total_size;
 
-	memory = malloc(count * size);
+	total_size = count * size;
+	memory = malloc(total_size);
 	if (memory == NULL)
-	{
 		return (NULL);
+	// ft_memset'in içeriği doğrudan buraya entegre edildi
+	ptr = (unsigned char *)memory;
+	while (total_size > 0)
+	{
+		*ptr = 0;
+		ptr++;
+		total_size--;
 	}
-	ft_memset(memory, 0, size * count);
 	return (memory);
 }
 

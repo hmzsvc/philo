@@ -6,29 +6,16 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:41 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 14:12:45 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 11:35:32 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../lib/philo.h"
 #include <stdio.h>
-#include <unistd.h>
 
-void	ft_usleep(int wait_time, t_philo *philo) // neden ft_usleep?
+int main(int argc, char *argv[])
 {
-	unsigned long long	time;
-
-	time = get_time_in_ms();
-	while (get_time_in_ms() - time < (unsigned long long)wait_time)
-	{
-		handle_dead(philo);
-		usleep(100);
-	}
-}
-
-int	main(int argc, char *argv[])
-{
-	t_table	data;
+	t_table data;
 
 	if (argc == 5 || argc == 6)
 	{

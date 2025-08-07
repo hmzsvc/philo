@@ -1,14 +1,14 @@
-# Philosophers Projesi - Detaylı Kod Analizi
+# Philosophers Projesi - Güncel Kod Analizi
 
 ## 📖 İçindekiler
 1. [Proje Genel Bakış](#proje-genel-bakış)
-2. [Dosya Yapısı](#dosya-yapısı)
+2. [Güncel Dosya Yapısı](#güncel-dosya-yapısı)
 3. [Veri Yapıları](#veri-yapıları)
 4. [Program Akışı](#program-akışı)
 5. [Fonksiyon Analizleri](#fonksiyon-analizleri)
 6. [Thread Yönetimi](#thread-yönetimi)
 7. [Mutex Kullanımı](#mutex-kullanımı)
-8. [Hata Yönetimi](#hata-yönetimi)
+8. [Derleme ve Test](#derleme-ve-test)
 
 ---
 
@@ -25,27 +25,45 @@
 
 ---
 
-## Dosya Yapısı
+## Güncel Dosya Yapısı
 
 ```
 philo/
-├── src/
-│   └── philo.c              # Ana program dosyası
-├── utils/
-│   ├── helpers.c            # Yardımcı fonksiyonlar
-│   ├── monitor.c            # İzleme thread'i
-│   ├── monitor_utils.c      # İzleme yardımcıları
-│   ├── mutex_utils.c        # Mutex yönetimi
-│   ├── philo_routine.c      # Filozof rutinleri
-│   ├── philo_utils.c        # Filozof yardımcıları
-│   └── utils.c              # Genel yardımcılar
-├── error/
-│   └── error_handle.c       # Hata yönetimi
-├── lib/
+├── src/                     # Ana kaynak dosyalar
+│   ├── philo.c              # Ana program dosyası (main, ft_usleep)
+│   ├── philo_utils.c        # Filozof thread'i ve ana döngü yönetimi
+│   ├── mandotary.c          # Temel filozof fonksiyonları (eat, sleep, think, take_fork)
+│   ├── monitor.c            # İzleme thread'i (ölüm ve yemek hedefi kontrolü)
+│   ├── support.c            # Yardımcı fonksiyonlar (atoi, parse_args)
+│   ├── mutex.c              # Mutex yönetimi ve senkronizasyon
+│   ├── helpers.c            # Genel yardımcı fonksiyonlar
+│   └── error_handle.c       # Hata yönetimi ve bellek temizleme
+├── utils/                   # Ek yardımcı dosyalar (kullanılmıyor - boş)
+│   ├── helpers.c
+│   ├── monitor.c
+│   ├── monitor_utils.c
+│   ├── mutex_utils.c
+│   ├── philo_routine.c
+│   ├── philo_utils.c
+│   └── utils.c
+├── error/                   # Hata yönetimi (kullanılmıyor - boş)
+│   └── error_handle.c
+├── lib/                     # Header dosyaları
 │   ├── philo.h              # Ana header dosyası
-│   └── error.h              # Hata kodları
-└── Makefile                 # Derleme dosyası
+│   └── error.h              # Hata kodları ve sabitler
+├── obj/                     # Derleme object dosyaları
+├── Makefile                 # Derleme dosyası
+├── philo                    # Derlenmiş executable
+├── advanced_test_philo.sh   # Gelişmiş test scripti
+├── benchmark_philo.sh       # Performans test scripti
+└── ultimate_tester.sh       # Kapsamlı test scripti
 ```
+
+### Aktif Dosyalar:
+- **src/**: Ana kodların bulunduğu klasör (8 dosya)
+- **lib/**: Header dosyaları (2 dosya)
+- **Makefile**: Sadece src/ klasöründeki dosyaları derler
+- **utils/ ve error/**: Boş klasörler (Makefile'da kullanılmıyor)
 
 ---
 
@@ -55,7 +73,7 @@ philo/
 ```c
 typedef struct s_philo
 {
-    int                id;                  // Filozofun kimliği (1, 2, 3...)
+    int                identity;            // Filozofun kimliği (1, 2, 3...)
     int                left_fork_bool;      // Sol çatal kullanımda mı?
     int                right_fork_bool;     // Sağ çatal kullanımda mı?
     int                eat_count;           // Kaç kez yemek yedi
@@ -64,13 +82,13 @@ typedef struct s_philo
     pthread_mutex_t    *left_fork;          // Sol çatal mutex'i
     pthread_mutex_t    *right_fork;         // Sağ çatal mutex'i
     pthread_mutex_t    eat_count_mutex;     // Yemek sayısı mutex'i
-    t_data             *data;               // Ana veri yapısına pointer
+    t_table            *data;               // Ana veri yapısına pointer
 } t_philo;
 ```
 
-### 2. `t_data` Yapısı (Oyun Durumu)
+### 2. `t_table` Yapısı (Masa/Oyun Durumu)
 ```c
-typedef struct s_data
+typedef struct s_table
 {
     int                philo_count;         // Filozof sayısı
     int                dead_index;          // Ölen filozofun index'i
@@ -80,7 +98,7 @@ typedef struct s_data
     int                time_to_eat;         // Yemek süresi (ms)
     int                time_to_sleep;       // Uyku süresi (ms)
     int                start_flag;          // Başlama sinyali
-    int                must_meal_num;       // Yemek hedefine ulaşan sayısı
+    int                must_meal_loop;      // Yemek hedefine ulaşan sayısı
     long long          start_time;          // Başlangıç zamanı
     long long          last_meal_philo;     // Son yemek zamanı
     pthread_t          monitor_philo;       // İzleyici thread
@@ -92,17 +110,17 @@ typedef struct s_data
     pthread_mutex_t    meal_mutex;          // Yemek zamanı mutex'i
     pthread_mutex_t    must_meal_mutex;     // Zorunlu yemek mutex'i
     t_philo            *philos;             // Filozof dizisi
-} t_data;
+} t_table;
 ```
 
-### 3. Hata Kodları
+### 3. Hata Kodları (lib/error.h)
 ```c
 typedef enum s_error_code
 {
-    ERR_MALLOC_FAIL = 1,    // Bellek tahsisi hatası
-    ERR_INVALID_ARG = 2,    // Geçersiz argüman
-    ERR_THREAD_FAIL = 3,    // Thread oluşturma hatası
-    ERR_ATOI_FAIL = 4,      // String'den integer dönüştürme hatası
+    ERR_MALLOC_FAIL,    // 0 - Bellek tahsisi hatası
+    ERR_INVALID_ARG,    // 1 - Geçersiz argüman
+    ERR_THREAD_FAIL,    // 2 - Thread oluşturma hatası
+    ERR_ATOI_FAIL,      // 3 - String'den integer dönüştürme hatası
 } t_error_code;
 ```
 
@@ -115,16 +133,16 @@ typedef enum s_error_code
 ```c
 int main(int argc, char *argv[])
 {
-    t_data data;
+    t_table data;
 
     if (argc == 5 || argc == 6)  // Argüman kontrolü
     {
-        init_philo(&data, argv, argc);      // 1. Veri yapısını başlat
-        init_forks(&data);                  // 2. Mutex'leri başlat
-        monitor_philo_create(&data);        // 3. İzleyici thread'i oluştur
-        create_philo(&data);                // 4. Filozof thread'lerini oluştur
-        philo_join(&data);                  // 5. Thread'leri bekle
-        cleanup(&data);                     // 6. Temizlik yap
+        initialize_table(&data, argv, argc);     // 1. Veri yapısını başlat
+        initialize_forks(&data);                 // 2. Mutex'leri başlat
+        setup_philosopher_monitor(&data);        // 3. İzleyici thread'i oluştur
+        create_philo(&data);                     // 4. Filozof thread'lerini oluştur
+        philo_join(&data);                       // 5. Thread'leri bekle
+        reset_table(&data);                      // 6. Temizlik yap
         return (0);
     }
     else
@@ -138,19 +156,19 @@ int main(int argc, char *argv[])
 ### 2. Akış Sırası
 
 1. **Argüman Kontrolü**: 5 veya 6 argüman olmalı
-2. **Veri Başlatma**: Struct'ları ve değerleri başlat
-3. **Mutex Başlatma**: Bütün mutex'leri oluştur
-4. **İzleyici Oluşturma**: Ölüm kontrolü için thread oluştur
-5. **Filozof Oluşturma**: Her filozof için thread oluştur
+2. **Veri Başlatma**: Struct'ları ve değerleri başlat (`initialize_table`)
+3. **Mutex Başlatma**: Bütün mutex'leri oluştur (`initialize_forks`)
+4. **İzleyici Oluşturma**: Ölüm kontrolü için thread oluştur (`setup_philosopher_monitor`)
+5. **Filozof Oluşturma**: Her filozof için thread oluştur (`create_philo`)
 6. **Başlatma**: Bütün thread'leri senkronize başlat
-7. **Bekleme**: Thread'lerin bitmesini bekle
-8. **Temizlik**: Bellek ve mutex'leri temizle
+7. **Bekleme**: Thread'lerin bitmesini bekle (`philo_join`)
+8. **Temizlik**: Bellek ve mutex'leri temizle (`reset_table`)
 
 ---
 
 ## Fonksiyon Analizleri
 
-### 📂 src/philo.c
+### 📂 src/philo.c (Ana Dosya)
 
 #### `main` Fonksiyonu
 ```c
@@ -168,36 +186,93 @@ void ft_usleep(int wait_time, t_philo *philo)
 ```
 - **Amaç**: Kesin süre bekleme (normal usleep'ten daha hassas)
 - **Çalışma**: 
-  1. Başlangıç zamanını al
+  1. Başlangıç zamanını al (`get_time_in_ms`)
   2. Hedef süre kadar döngüde bekle
-  3. Her 100 mikrosaniyede ölüm kontrolü yap
+  3. Her 100 mikrosaniyede ölüm kontrolü yap (`handle_dead`)
 
-### 📂 utils/utils.c
+### 📂 src/philo_utils.c (Filozof Başlatma)
 
-#### `ft_atoi` Fonksiyonu
+#### `initialize_table` Fonksiyonu
 ```c
-int ft_atoi(char *str, int *res)
+void initialize_table(t_table *data, char *argv[], int argc)
 ```
-- **Amaç**: String'i integer'a çevir (güvenli versiyon)
-- **Kontroller**:
-  1. Uzunluk kontrolü (11 karakterden az)
-  2. Negatif sayı kontrolü (hata)
-  3. Karakter geçerliliği kontrolü
-  4. Integer overflow kontrolü
+- **Amaç**: Ana veri yapısını başlat
+- **İşlemler**:
+  1. Argümanları parse et (`parse_args`)
+  2. Filozof dizisini oluştur (`ft_calloc`)
+  3. Her filozofun temel bilgilerini ayarla
+  4. Hata kontrolü yap (`handle_error`)
 
-#### `parse_args` Fonksiyonu
+#### `create_philo` Fonksiyonu
 ```c
-void parse_args(char *argv[], t_data *data, int argc)
+void create_philo(t_table *data)
 ```
-- **Amaç**: Komut satırı argümanlarını parse et
-- **Argümanlar**:
-  1. `argv[1]`: Filozof sayısı
-  2. `argv[2]`: Ölüm süresi (ms)
-  3. `argv[3]`: Yemek süresi (ms)
-  4. `argv[4]`: Uyku süresi (ms)
-  5. `argv[5]`: (Opsiyonel) Zorunlu yemek sayısı
+- **Amaç**: Filozof thread'lerini oluştur
+- **İşlemler**:
+  1. Her filozof için thread oluştur (`pthread_create`)
+  2. Başlangıç zamanını ayarla (`set_time`)
+  3. Start flag'ini ayarla
 
-#### `print` Fonksiyonu
+#### `initialize_forks` Fonksiyonu
+```c
+void initialize_forks(t_table *data)
+```
+- **Amaç**: Çatal mutex'lerini başlat
+- **İşlemler**:
+  1. Bütün mutex'leri initialize et
+  2. Her filozofa sol/sağ çatal pointer'ları ata
+  3. Çatal dizisini oluştur
+
+### 📂 src/mandotary.c (Temel Fonksiyonlar)
+
+#### `philo_eat` Fonksiyonu
+```c
+void philo_eat(t_philo *philo)
+```
+- **Amaç**: Filozof yemek yer
+- **İşlemler**:
+  1. Son yemek zamanını güncelle (`last_meal_added`)
+  2. "is eating" yazdır (`print`)
+  3. Yemek sayısını artır (thread-safe)
+  4. Yemek süresi kadar bekle (`ft_usleep`)
+
+#### `philo_sleep` Fonksiyonu
+```c
+void philo_sleep(t_philo *philo)
+```
+- **Amaç**: Filozof uyur
+- **İşlemler**:
+  1. "is sleeping" yazdır
+  2. Uyku süresi kadar bekle
+
+#### `philo_thinking` Fonksiyonu
+```c
+void philo_thinking(t_philo *philo)
+```
+- **Amaç**: Filozof düşünür
+- **İşlemler**:
+  1. "is thinking" yazdır
+  2. Optimizasyon için kısa süre bekle
+
+#### `philo_take_fork` Fonksiyonu
+```c
+void philo_take_fork(t_philo *philo)
+```
+- **Amaç**: Çatalları al (deadlock önleme ile)
+- **Deadlock Önleme Stratejisi**:
+  - Çift ID'li filozoflar: önce sol, sonra sağ çatal
+  - Tek ID'li filozoflar: önce sağ, sonra sol çatal
+  - Bu sayede circular wait durumu önlenir
+
+#### `philo_dead` Fonksiyonu
+```c
+void philo_dead(t_philo philo)
+```
+- **Amaç**: Ölüm mesajını yazdır
+- **İşlemler**:
+  1. Print mutex'i kilitle
+  2. Ölüm zamanını ve ID'yi yazdır
+  3. Mutex'i aç
 ```c
 void print(t_philo *philo, char *str)
 ```
@@ -223,246 +298,334 @@ void init_philo(t_data *data, char *argv[], int argc)
   4. Filozof dizisi için bellek tahsis et
   5. Her filozof için başlangıç değerlerini ata
 
-#### `create_philo` Fonksiyonu
-```c
-void create_philo(t_data *data)
-```
-- **Amaç**: Filozof thread'lerini oluştur
-- **Akış**:
-  1. Her filozof için thread oluştur
-  2. Thread oluşturma hatası varsa hata flag'i set et
-  3. Başlangıç zamanını kaydet
-  4. Başlama sinyali ver
+## Fonksiyon Analizleri
 
-#### `init_forks` Fonksiyonu
+### 📂 src/philo.c (Ana Dosya)
+
+#### `main` Fonksiyonu
 ```c
-void init_forks(t_data *data)
+int main(int argc, char *argv[])
 ```
-- **Amaç**: Bütün mutex'leri başlat
-- **Başlatılan Mutex'ler**:
-  1. `death_mutex`: Ölüm durumu
-  2. `start_flag_mutex`: Başlama sinyali
-  3. `check_meal_mutex`: Yemek kontrol
-  4. `print_mutex`: Yazdırma
-  5. `must_meal_mutex`: Zorunlu yemek
-  6. `meal_mutex`: Yemek zamanı
-  7. Çatal mutex'leri (her çatal için)
-  8. Filozof yemek sayısı mutex'leri
+- **Amaç**: Programın giriş noktası
+- **Argümanlar**: 4 veya 5 parametre (number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat])
+- **Akış**: 
+  1. Argüman sayısını kontrol et (5 veya 6 olmalı)
+  2. `initialize_table`: Ana veri yapısını başlat
+  3. `initialize_forks`: Mutex'leri başlat
+  4. `setup_philosopher_monitor`: İzleyici thread'i oluştur
+  5. `create_philo`: Filozof thread'lerini oluştur
+  6. `philo_join`: Thread'leri bekle
+  7. `reset_table`: Temizlik yap
+
+#### `ft_usleep` Fonksiyonu
+```c
+void ft_usleep(int wait_time, t_philo *philo)
+```
+- **Amaç**: Kesin süre bekleme (normal usleep'ten daha hassas)
+- **Özellik**: Bekleme sırasında sürekli ölüm kontrolü yapar
+- **Çalışma**: 
+  1. Başlangıç zamanını al (`get_time_in_ms`)
+  2. Hedef süre kadar döngüde bekle
+  3. Her 100 mikrosaniyede ölüm kontrolü yap (`handle_dead`)
+
+### 📂 src/philo_utils.c (Filozof Thread Yönetimi)
+
+#### `run_philo_loop` Fonksiyonu (static)
+```c
+static void run_philo_loop(t_philo *philo)
+```
+- **Amaç**: Filozofun ana yaşam döngüsü
+- **Döngü**:
+  1. Ölüm kontrolü yap
+  2. Yemek hedefine ulaştı mı kontrol et
+  3. Çatalları al (`philo_take_fork`)
+  4. Yemek ye (`philo_eat`)
+  5. Çatalları bırak
+  6. Uyu (`philo_sleep`)
+  7. Düşün (`philo_thinking`)
 
 #### `philo_process` Fonksiyonu (static)
 ```c
 static void *philo_process(void *arg)
 ```
-- **Amaç**: Her filozofun ana rutini
+- **Amaç**: Her filozofun thread fonksiyonu
 - **Akış**:
   1. Başlama sinyalini bekle
-  2. Tek filozof özel durumunu kontrol et
-  3. Senkronizasyon yap
-  4. Ana döngü:
-     - Çatalları al
-     - Yemek ye
-     - Çatalları bırak
-     - Uyu
-     - Düşün
-  5. Ölüm durumunda çık
+  2. Tek filozof durumunu kontrol et
+  3. Senkronizasyon için bekle
+  4. Ana döngüyü çalıştır (`run_philo_loop`)
 
-### 📂 utils/philo_routine.c
+#### `initialize_table` Fonksiyonu
+```c
+void initialize_table(t_table *data, char *argv[], int argc)
+```
+- **Amaç**: Ana veri yapısını başlat
+- **İşlemler**:
+  1. Argümanları parse et (`parse_args`)
+  2. Değişkenleri başlat
+  3. Filozof dizisi için bellek tahsis et
+  4. Her filozofun temel bilgilerini ayarla
+
+#### `create_philo` Fonksiyonu
+```c
+void create_philo(t_table *data)
+```
+- **Amaç**: Filozof thread'lerini oluştur
+- **İşlemler**:
+  1. Her filozof için pthread_create çağır
+  2. Başlangıç zamanını ayarla (`set_time`)
+  3. Start flag'ini set et
+
+#### `initialize_forks` Fonksiyonu
+```c
+void initialize_forks(t_table *data)
+```
+- **Amaç**: Çatal mutex'lerini ve diğer mutex'leri başlat
+- **Başlatılan Mutex'ler**:
+  1. Çatal mutex'leri (filozof sayısı kadar)
+  2. `death_mutex`, `start_flag_mutex`, `print_mutex`
+  3. `meal_mutex`, `must_meal_mutex`, `check_meal_mutex`
+  4. Her filozof için `eat_count_mutex`
+
+### 📂 src/mandotary.c (Temel Filozof Fonksiyonları)
 
 #### `philo_eat` Fonksiyonu
 ```c
 void philo_eat(t_philo *philo)
 ```
 - **Amaç**: Filozof yemek yer
-- **Adımlar**:
-  1. Son yemek zamanını güncelle
-  2. "is eating" mesajını yazdır
-  3. Yemek sayısını artır (mutex ile)
-  4. Yemek süresince bekle
+- **İşlemler**:
+  1. Son yemek zamanını güncelle (`last_meal_added`)
+  2. "is eating" mesajını yazdır (`print`)
+  3. Yemek sayısını thread-safe artır
+  4. Yemek süresi kadar bekle (`ft_usleep`)
 
 #### `philo_sleep` Fonksiyonu
 ```c
 void philo_sleep(t_philo *philo)
 ```
 - **Amaç**: Filozof uyur
-- **Adımlar**:
+- **İşlemler**:
   1. "is sleeping" mesajını yazdır
-  2. Uyku süresince bekle
+  2. Uyku süresi kadar bekle
 
 #### `philo_thinking` Fonksiyonu
 ```c
 void philo_thinking(t_philo *philo)
 ```
 - **Amaç**: Filozof düşünür
-- **Hesaplama**: `time_to_die - (time_to_eat + time_to_sleep)` kadar bekle
-- **Amaç**: Optimal timing için
+- **Özellik**: Optimizasyon için `time_to_die - (time_to_eat + time_to_sleep)` kadar bekler
+- **Amaç**: Optimal timing sağlama
 
 #### `philo_dead` Fonksiyonu
 ```c
 void philo_dead(t_philo philo)
 ```
-- **Amaç**: Ölüm mesajını yazdır
-- **Format**: `[zaman] [id] died`
+- **Amaç**: Ölüm mesajını thread-safe yazdır
+- **Format**: `[zaman_ms] [filozof_id] died`
 
 #### `philo_take_fork` Fonksiyonu
 ```c
 void philo_take_fork(t_philo *philo)
 ```
-- **Amaç**: Çatalları al (deadlock önleyici)
-- **Strateji**:
-  - **Çift ID**: Sol sonra sağ çatalı al
-  - **Tek ID**: Sağ sonra sol çatalı al (20µs gecikme ile)
-- **Deadlock Önleme**: Farklı sıralama ile
+- **Amaç**: Çatalları al (deadlock önleyici strateji ile)
+- **Deadlock Önleme**:
+  - **Çift ID**: Önce sol, sonra sağ çatal
+  - **Tek ID**: Önce sağ, sonra sol çatal (20µs gecikme ile)
+- **Mesaj**: Her çatal alınışında "has taken a fork" yazdır
 
-### 📂 utils/mutex_utils.c
+### 📂 src/monitor.c (İzleme Thread'i)
+
+#### `watch_for_death` Fonksiyonu (static)
+```c
+static void *watch_for_death(void *argv)
+```
+- **Amaç**: Sürekli ölüm ve yemek hedefi kontrolü
+- **Döngü**:
+  1. Her filozofu kontrol et (`check_and_handle_death`)
+  2. Ölüm zamanı kontrolü yap
+  3. Yemek hedefine ulaşma kontrolü yap
+  4. Problem varsa döngüden çık
+
+#### `check_and_handle_death` Fonksiyonu (static)
+```c
+static int check_and_handle_death(t_table *data, int philo_index)
+```
+- **Amaç**: Belirli filozofun ölüm durumunu kontrol et
+- **Kontrol**: `current_time - last_meal_time >= time_to_die`
+- **Döndürür**: 1 ölüm varsa, 0 yaşıyorsa
+
+#### `setup_philosopher_monitor` Fonksiyonu
+```c
+void setup_philosopher_monitor(t_table *data)
+```
+- **Amaç**: İzleyici thread'ini oluştur
+- **İşlem**: `watch_for_death` fonksiyonu ile pthread_create
+
+### 📂 src/mutex.c (Mutex Yönetimi)
 
 #### `check_dead` Fonksiyonu
 ```c
 int check_dead(t_philo *philo)
 ```
-- **Amaç**: Ölüm durumunu kontrol et
-- **Döndürür**: 1 ölü ise, 0 yaşıyor ise
+- **Amaç**: Thread-safe ölüm durumu kontrolü
 - **Durumlar**:
   - `is_dead = 1`: Normal ölüm
   - `is_dead = 2`: Thread hatası
   - `is_dead = 3`: Herkes yeterince yedi
 
-#### `check_start_flag` Fonksiyonu
-```c
-int check_start_flag(t_philo *philo)
-```
-- **Amaç**: Başlama sinyalini kontrol et
-- **Kullanım**: Thread'lerin senkronize başlaması için
-
 #### `handle_dead` Fonksiyonu
 ```c
-void handle_dead(t_philo *philo)
+int handle_dead(t_philo *philo)
 ```
 - **Amaç**: Ölüm durumunda temizlik
-- **Akış**:
+- **İşlemler**:
   1. Ölüm durumunu kontrol et
   2. Tutulan çatalları bırak
-  3. Thread'den çık
+  3. Çatal flag'lerini sıfırla
 
 #### `check_meal_goal` Fonksiyonu
 ```c
-void check_meal_goal(t_philo *philo)
+int check_meal_goal(t_philo *philo)
 ```
 - **Amaç**: Yemek hedefini kontrol et
-- **Akış**:
+- **İşlemler**:
   1. Hedef yemek sayısına ulaştı mı kontrol et
   2. Ulaştıysa global sayacı artır
-  3. Çatalları bırak ve thread'den çık
+  3. Çatalları bırak ve 1 döndür
 
 #### `last_meal_added` Fonksiyonu
 ```c
 void last_meal_added(t_philo *philo)
 ```
-- **Amaç**: Son yemek zamanını güncelle (thread-safe)
+- **Amaç**: Son yemek zamanını thread-safe güncelle
 
-### 📂 utils/monitor.c
-
-#### `monitor_process` Fonksiyonu (static)
-```c
-static void *monitor_process(void *argv)
-```
-- **Amaç**: Filozofları sürekli izle
-- **Akış**:
-  1. Başlama sinyalini bekle
-  2. Sonsuz döngüde:
-     - Her filozofu kontrol et
-     - Ölüm zamanını kontrol et
-     - Yemek hedefini kontrol et
-  3. Problem varsa çık
-
-#### `monitor_philo_create` Fonksiyonu
-```c
-void monitor_philo_create(t_data *data)
-```
-- **Amaç**: İzleyici thread'ini oluştur
-- **Hata Durumu**: Thread oluşturulamazsa hata flag'leri set et
-
-### 📂 utils/monitor_utils.c
-
-#### `set_death_status` Fonksiyonu (static)
-```c
-static void set_death_status(t_data *data, int philo_index)
-```
-- **Amaç**: Ölüm durumunu thread-safe şekilde set et
-
-#### `check_and_handle_death` Fonksiyonu
-```c
-void check_and_handle_death(t_data *data, int philo_index)
-```
-- **Amaç**: Belirli filozofun ölüm durumunu kontrol et
-- **Kontrol**: `current_time - last_meal_time >= time_to_die`
-
-#### `wait_start` Fonksiyonu
-```c
-void wait_start(t_data *data)
-```
-- **Amaç**: Başlama sinyalini bekle
-- **Kullanım**: İzleyici thread için
-
-### 📂 utils/helpers.c
+### 📂 src/helpers.c (Yardımcı Fonksiyonlar)
 
 #### `philo_join` Fonksiyonu
 ```c
-void philo_join(t_data *data)
+void philo_join(t_table *data)
 ```
-- **Amaç**: Bütün thread'leri bekle
+- **Amaç**: Bütün thread'leri bekle ve sonuçları yönet
 - **Sıra**:
-  1. İzleyici thread'ini bekle
-  2. Ölüm durumunda ölüm mesajını yazdır
-  3. Bütün filozof thread'lerini bekle
+  1. İzleyici thread'ini bekle (`pthread_join`)
+  2. Ölüm varsa ölüm mesajını yazdır
+  3. Tek filozof özel durumunu kontrol et
+  4. Bütün filozof thread'lerini bekle
 
 #### `ft_calloc` Fonksiyonu
 ```c
 void *ft_calloc(size_t count, size_t size)
 ```
 - **Amaç**: Bellek tahsis et ve sıfırla
-- **Güvenlik**: NULL kontrolü var
+- **Özellik**: `ft_memset` ile sıfırlama
 
 #### `get_time_in_ms` Fonksiyonu
 ```c
 long long get_time_in_ms(void)
 ```
-- **Amaç**: Millisaniye cinsinden zaman al
-- **Kullanım**: `gettimeofday` kullanarak
+- **Amaç**: Milisaniye cinsinden sistem zamanı al
+- **Kullanım**: `gettimeofday` sistem çağrısı
 
 #### `set_time` Fonksiyonu
 ```c
-void set_time(t_data *data)
+void set_time(t_table *data)
 ```
-- **Amaç**: Başlangıç zamanını set et
+- **Amaç**: Başlangıç zamanını kaydet
 
-### 📂 error/error_handle.c
+### 📂 src/support.c (Argüman İşleme)
 
-#### `cleanup` Fonksiyonu
+#### `parse_args` Fonksiyonu
 ```c
-void cleanup(t_data *data)
+void parse_args(char *argv[], t_table *data, int argc)
 ```
-- **Amaç**: Bütün kaynakları temizle
-- **Temizlik**:
-  1. Bütün mutex'leri destroy et
-  2. Bellek alanlarını free et
+- **Amaç**: Komut satırı argümanlarını parse et
+- **İşlemler**:
+  1. Her argümanı integer'a çevir (`ft_atoi`)
+  2. Geçersiz değerlerde hata fırlat
+  3. Veri yapısına ata
 
-#### `error_check` Fonksiyonu
+#### `ft_atoi` Fonksiyonu (static)
 ```c
-void error_check(t_data *data, int err_code, void *ptr)
+static int ft_atoi(char *str, int *res)
 ```
-- **Amaç**: Hata durumlarını kontrol et
-- **Akış**:
-  1. Pointer NULL ise hata
-  2. Hata mesajını yazdır
-  3. Temizlik yap
-  4. Program sonlandır
+- **Amaç**: String'i integer'a çevir
+- **Özellikler**:
+  1. Negatif sayı kontrolü
+  2. Uzunluk kontrolü (max 11 karakter)
+  3. Overflow kontrolü (max 2147483647)
+  4. Geçersiz karakter kontrolü
+### 📂 src/error_handle.c (Hata Yönetimi)
 
-#### `error_check_mutex` Fonksiyonu
+#### `handle_error` Fonksiyonu
 ```c
-void error_check_mutex(t_data *data, int value)
+void handle_error(t_table *data, int err_code, void *str)
+```
+- **Amaç**: Hata durumlarında temizlik ve çıkış
+- **Hata Türleri**:
+  - `ERR_MALLOC_FAIL`: Bellek tahsisi hatası
+  - `ERR_INVALID_ARG`: Geçersiz argüman
+  - `ERR_THREAD_FAIL`: Thread oluşturma hatası
+  - `ERR_ATOI_FAIL`: String parse hatası
+
+#### `reset_table` Fonksiyonu
+```c
+void reset_table(t_table *data)
+```
+- **Amaç**: Program sonunda temizlik yap
+- **İşlemler**:
+  1. Bütün mutex'leri destroy et (`destroy_mutex`)
+  2. Filozof dizisini free et
+  3. Çatal dizisini free et
+
+#### `destroy_mutex` Fonksiyonu (static)
+```c
+static void destroy_mutex(t_table *data)
+```
+- **Amaç**: Bütün mutex'leri güvenli şekilde destroy et
+- **Temizlenen Mutex'ler**:
+  1. Ana mutex'ler (death, print, start_flag, check_meal)
+  2. Çatal mutex'leri
+  3. Filozof eat_count mutex'leri
+
+#### `handle_mutex_error` Fonksiyonu
+```c
+void handle_mutex_error(t_table *data, int value)
 ```
 - **Amaç**: Mutex işlem hatalarını kontrol et
-- **Kontrol**: `value != 0` ise hata
+- **Kontrol**: `value != 0` ise hata flag'i set et
+
+### 📂 src/support.c Ek Fonksiyonlar
+
+#### `one_philo_handle` Fonksiyonu
+```c
+void one_philo_handle(t_philo *philo)
+```
+- **Amaç**: Tek filozof özel durumunu işle
+- **İşlem**:
+  1. Tek çatalı al ve mesaj yazdır
+  2. Çatalı bırak
+  3. Ölüm flag'ini set et (çünkü tek çatalla yemek yenilemez)
+
+#### `print` Fonksiyonu
+```c
+void print(t_philo *philo, char *str)
+```
+- **Amaç**: Thread-safe mesaj yazdırma
+- **Kontroller**:
+  1. Yemek hedefi tamamlandı mı kontrol et
+  2. Ölüm durumu kontrol et
+  3. Kontroller geçerse mesaj yazdır
+- **Format**: `[zaman_ms] [filozof_id] [mesaj]`
+
+#### `sync_philo_start` Fonksiyonu
+```c
+void sync_philo_start(t_philo *philo)
+```
+- **Amaç**: Filozof thread'lerinin senkronize başlaması
+- **İşlemler**:
+  1. Son yemek zamanını başlangıç zamanına set et
+  2. Tek ID'li filozoflar için gecikme ekle (deadlock önleme)
 
 ---
 
@@ -596,11 +759,94 @@ if (!(*(str + i) >= '0' && *(str + i) <= '9'))
 
 ---
 
+## Derleme ve Test
+
+### 1. Makefile Analizi
+
+#### Derleme Ayarları
+```makefile
+CC = @cc
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread -g
+```
+- **Thread Sanitizer**: `-fsanitize=thread` data race tespiti için
+- **Debug**: `-g` debug bilgisi
+- **Threading**: `-pthread` thread desteği
+
+#### Kaynak Dosyalar
+```makefile
+PHILO_SRCS = $(SRC_DIR)philo.c \
+             $(SRC_DIR)monitor.c \
+             $(SRC_DIR)support.c \
+             $(SRC_DIR)helpers.c \
+             $(SRC_DIR)philo_utils.c \
+             $(SRC_DIR)mutex.c \
+             $(SRC_DIR)mandotary.c \
+             $(SRC_DIR)error_handle.c \
+```
+
+#### Derleme Komutları
+```bash
+# Normal derleme
+make
+
+# Temizlik
+make clean      # Object dosyalarını sil
+make fclean     # Hepsini sil
+make re         # Yeniden derle
+```
+
+### 2. Test Stratejileri
+
+#### Normal Test Durumları
+```bash
+# 4 filozof, 410ms ölüm, 200ms yemek, 200ms uyku
+./philo 4 410 200 200
+
+# 5 filozof, 800ms ölüm, 200ms yemek, 200ms uyku, 7 kez yemek
+./philo 5 800 200 200 7
+```
+
+#### Edge Case'ler
+```bash
+# Tek filozof (ölmeli)
+./philo 1 800 200 200
+
+# Hızlı ölüm
+./philo 4 300 200 200
+
+# Çok filozof
+./philo 200 410 200 200
+```
+
+#### Test Scriptleri
+- **`advanced_test_philo.sh`**: Kapsamlı test senaryoları
+- **`benchmark_philo.sh`**: Performans testleri
+- **`ultimate_tester.sh`**: Sınır durumu testleri
+
+### 3. Debugging
+
+#### Thread Sanitizer Kullanımı
+```bash
+# Data race tespiti
+./philo 4 410 200 200 2>&1 | grep "WARNING"
+
+# Deadlock tespiti
+timeout 10s ./philo 4 410 200 200
+```
+
+#### Valgrind (Memory Check)
+```bash
+# Bellek sızıntısı kontrolü
+valgrind --leak-check=full ./philo 4 410 200 200
+```
+
+---
+
 ## Özel Durumlar
 
 ### 1. Tek Filozof Durumu
 ```c
-static void one_philo_handle(t_philo *philo)
+void one_philo_handle(t_philo *philo)
 {
     if (philo->data->philo_count == 1)
     {
@@ -614,34 +860,61 @@ static void one_philo_handle(t_philo *philo)
     }
 }
 ```
+- **Problem**: Tek çatalla yemek yenemiyor
+- **Çözüm**: Çatalı al, bırak ve ölüm flag'i set et
 
-### 2. Deadlock Önleme
+### 2. Deadlock Önleme (mandotary.c)
 ```c
-// Çift ID: Sol-Sağ sırası
-if (philo->id % 2 == 0)
+void philo_take_fork(t_philo *philo)
 {
-    pthread_mutex_lock(philo->left_fork);
-    pthread_mutex_lock(philo->right_fork);
-}
-// Tek ID: Sağ-Sol sırası (gecikme ile)
-else
-{
-    pthread_mutex_lock(philo->right_fork);
-    usleep(20);
-    pthread_mutex_lock(philo->left_fork);
+    if (philo->identity % 2 == 0)  // Çift ID
+    {
+        pthread_mutex_lock(philo->left_fork);
+        philo->left_fork_bool = 1;
+        print(philo, "has taken a fork");
+        pthread_mutex_lock(philo->right_fork);
+        philo->right_fork_bool = 1;
+        print(philo, "has taken a fork");
+    }
+    else  // Tek ID
+    {
+        pthread_mutex_lock(philo->right_fork);
+        philo->right_fork_bool = 1;
+        print(philo, "has taken a fork");
+        usleep(20);  // Kısa gecikme
+        pthread_mutex_lock(philo->left_fork);
+        philo->left_fork_bool = 1;
+        print(philo, "has taken a fork");
+    }
 }
 ```
+- **Strateji**: Çift ve tek ID'li filozoflar farklı sırada çatal alır
+- **Amaç**: Circular wait durumunu engeller
 
-### 3. Timing Optimizasyonu
+### 3. Timing Optimizasyonu (mandotary.c)
 ```c
-// Düşünme süresi hesaplama
-usleep(philo->data->time_to_die - 
-       (philo->data->time_to_eat + philo->data->time_to_sleep));
+void philo_thinking(t_philo *philo)
+{
+    print(philo, "is thinking");
+    usleep(philo->data->time_to_die - (philo->data->time_to_eat
+            + philo->data->time_to_sleep));
+}
 ```
+- **Hesaplama**: Maksimum güvenli düşünme süresi
+- **Amaç**: Ölümü önleyici optimal timing
+
+### 4. Senkronizasyon (philo_utils.c)
+```c
+// Tek ID'li filozoflar gecikme ile başlar
+if (philo->identity % 2 != 0)
+    ft_usleep(philo->data->time_to_eat, philo);
+```
+- **Amaç**: Başlangıçta çatal rekabetini azalt
+- **Etki**: Daha stabil performans
 
 ---
 
-## Sonuç
+## Sonuç ve Kullanım Notları
 
 Bu **Philosophers** projesi karmaşık bir concurrent programming örneğidir. Ana öğeleri:
 
@@ -651,5 +924,26 @@ Bu **Philosophers** projesi karmaşık bir concurrent programming örneğidir. A
 4. **Resource Sharing**: Çatal paylaşımı
 5. **Timing Control**: Hassas zaman kontrolü
 6. **Error Handling**: Kapsamlı hata yönetimi
+
+### ⚠️ Önemli Notlar
+
+1. **Thread Sanitizer**: Kodda `-fsanitize=thread` aktif, data race'leri tespit eder
+2. **Tek Filozof**: Özel durum, mutlaka ölür (çatalları paylaşamaz)
+3. **Timing Kritik**: `ft_usleep` kullanımı hassas zamanlama için
+4. **Deadlock**: Çift/tek ID stratejisi ile önlenir
+
+### 🔧 Geliştirme İpuçları
+
+1. **Debug**: Thread sanitizer çıktılarını takip et
+2. **Test**: Edge case'leri mutlaka test et
+3. **Performance**: Büyük filozof sayıları ile test et
+4. **Memory**: Valgrind ile bellek sızıntılarını kontrol et
+
+### 📁 Güncel Durum
+
+- **Son Güncelleme**: Ağustos 2025
+- **Aktif Dosyalar**: src/ klasöründeki 8 dosya
+- **Test Durumu**: Tüm test senaryoları geçiyor
+- **Norm Uygunluğu**: 42 Norm standartlarına uygun
 
 Proje, sistem programlama ve concurrent programming konularında derinlemesine bilgi gerektirir ve thread-safe programlama prensiplerini gösterir.

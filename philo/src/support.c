@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:42:37 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 12:48:08 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 11:56:57 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	parse_args(char *argv[], t_table *data, int argc)
 
 void	print(t_philo *philo, char *str)
 {
-	check_meal_goal(philo);
+	// check_meal_goal(philo);
 	handle_dead(philo);
 	pthread_mutex_lock(&philo->data->print_mutex);
 	if (!check_dead(philo))

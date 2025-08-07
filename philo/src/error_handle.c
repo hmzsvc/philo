@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:31 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 14:45:20 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/06 18:42:52 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	handle_mutex_error(t_table *data, int value)
 	exit(1);
 }
 
-void	one_philo_handle(t_philo *philo)
+void	single_philo_operation(t_philo *philo)
 {
 	if (philo->data->philo_count == 1)
 	{

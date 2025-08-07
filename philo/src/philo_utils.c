@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 14:46:25 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 11:59:43 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	*philo_process(void *arg)
 			break ;
 		usleep(100);
 	}
-	one_philo_handle(philo);
+	single_philo_operation(philo);
 	sync_philo_start(philo);
 	run_philo_loop(philo);
 	return (NULL);
