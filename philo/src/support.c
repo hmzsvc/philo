@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:42:37 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 11:56:57 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static int	ft_atoi(char *str, int *res)
 void	sync_philo_start(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->meal_mutex);
-	philo->last_meal_time = get_time_in_ms();
+	philo->last_meal_time = get_time();
 	pthread_mutex_unlock(&philo->data->meal_mutex);
 	if (philo->identity % 2 != 0)
 		ft_usleep(philo->data->time_to_eat, philo);
@@ -84,11 +84,11 @@ void	parse_args(char *argv[], t_table *data, int argc)
 void	print(t_philo *philo, char *str)
 {
 	// check_meal_goal(philo);
-	handle_dead(philo);
+	// handle_dead(philo);
 	pthread_mutex_lock(&philo->data->print_mutex);
 	if (!check_dead(philo))
 	{
-		printf("%lld %d %s\n", get_time_in_ms() - philo->data->start_time,
+		printf("%lld %d %s\n", get_time() - philo->data->start_time,
 			philo->identity, str);
 	}
 	pthread_mutex_unlock(&philo->data->print_mutex);

@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:12 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 11:59:43 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:45:58 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,33 +58,33 @@ static void	*philo_process(void *arg)
 	return (NULL);
 }
 
-void	initialize_table(t_table *data, char *argv[], int argc)
-{
-	int	i;
+// void	initialize_table(t_table *data, char *argv[], int argc)
+// {
+// 	int	i;
 
-	i = 0;
-	parse_args(argv, data, argc);
-	data->forks = NULL;
-	data->philos = NULL;
-	data->is_dead = 0;
-	data->dead_index = -1;
-	data->start_flag = 0;
-	data->must_meal_loop = 0;
-	data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
-	handle_error(data, ERR_MALLOC_FAIL, data->philos);
-	while (i < data->philo_count)
-	{
-		data->philos[i].identity = i + 1;
-		data->philos[i].data = data;
-		data->philos[i].last_meal_time = get_time_in_ms();
-		data->philos[i].eat_count = 0;
-		data->philos[i].left_fork_bool = 0;
-		data->philos[i].right_fork_bool = 0;
-		i++;
-	}
-	if ((data->philo_count != data->philos[i - 1].identity))
-		handle_error(data, ERR_THREAD_FAIL, NULL);
-}
+// 	i = 0;
+// 	parse_args(argv, data, argc);
+// 	data->forks = NULL;
+// 	data->philos = NULL;
+// 	data->is_dead = 0;
+// 	data->dead_index = -1;
+// 	data->start_flag = 0;
+// 	data->must_meal_loop = 0;
+// 	data->philos = ft_calloc(sizeof(t_philo), data->philo_count);
+// 	handle_error(data, ERR_MALLOC_FAIL, data->philos);
+// 	while (i < data->philo_count)
+// 	{
+// 		data->philos[i].identity = i + 1;
+// 		data->philos[i].data = data;
+// 		data->philos[i].last_meal_time = get_time();
+// 		data->philos[i].eat_count = 0;
+// 		data->philos[i].left_fork_bool = 0;
+// 		data->philos[i].right_fork_bool = 0;
+// 		i++;
+// 	}
+// 	if ((data->philo_count != data->philos[i - 1].identity))
+// 		handle_error(data, ERR_THREAD_FAIL, NULL);
+// }
 
 void	create_philo(t_table *data)
 {

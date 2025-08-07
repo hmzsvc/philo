@@ -2,7 +2,7 @@ NAME				= philo
 OBJ_DIR				= obj/
 SRC_DIR				= src/
 CC					= @cc
-CFLAGS				= -Wall -Wextra -Werror -pthread -fsanitize=thread -g
+CFLAGS				= -Wall -Wextra -Werror -pthread #-fsanitize=thread -g
 RM					= rm -rf
 
 PHILO_SRCS			=	$(SRC_DIR)philo.c \

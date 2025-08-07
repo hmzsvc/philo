@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 12:00:29 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,11 @@ void	ft_usleep(int wait_time, t_philo *philo) // neden ft_usleep?
 {
 	unsigned long long time;
 
-	time = get_time_in_ms();
-	while (get_time_in_ms() - time < (unsigned long long)wait_time)
+	time = get_time();
+	while (get_time() - time < (unsigned long long)wait_time)
 	{
-		handle_dead(philo);
+		if (handle_dead(philo))
+			break;
 		usleep(100);
 	}
 }
@@ -63,7 +64,7 @@ void	*ft_calloc(size_t count, size_t size)
 	return (memory);
 }
 
-long long	get_time_in_ms(void)
+long long	get_time(void)
 {
 	struct timeval	tv;
 
@@ -73,5 +74,5 @@ long long	get_time_in_ms(void)
 
 void	set_time(t_table *data)
 {
-	data->start_time = get_time_in_ms();
+	data->start_time = get_time();
 }

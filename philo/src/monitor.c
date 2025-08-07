@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:55:00 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 12:00:09 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static int	check_and_handle_death(t_table *data, int philo_index)
 	pthread_mutex_lock(&data->meal_mutex);
 	data->last_meal_philo = data->philos[philo_index].last_meal_time;
 	pthread_mutex_unlock(&data->meal_mutex);
-	if (get_time_in_ms() - data->last_meal_philo >= data->time_to_die)
+	if (get_time() - data->last_meal_philo >= data->time_to_die)
 	{
 		set_death_status(data, philo_index);
 		return (1);

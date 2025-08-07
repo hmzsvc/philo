@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:42:28 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 12:48:33 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	philo_dead(t_philo philo)
 {
 	pthread_mutex_lock(&philo.data->print_mutex);
 	usleep(50);
-	printf("%lld %d died\n", get_time_in_ms() - philo.data->start_time,
+	printf("%lld %d died\n", get_time() - philo.data->start_time,
 		philo.identity);
 	pthread_mutex_unlock(&philo.data->print_mutex);
 }

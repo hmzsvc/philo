@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:47:52 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/06 12:48:19 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,6 @@ int	check_meal_goal(t_philo *philo)
 void	last_meal_added(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->data->meal_mutex);
-	philo->last_meal_time = get_time_in_ms();
+	philo->last_meal_time = get_time();
 	pthread_mutex_unlock(&philo->data->meal_mutex);
 }
