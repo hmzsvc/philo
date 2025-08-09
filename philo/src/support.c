@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:42:37 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 22:35:32 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:30:14 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,33 +62,15 @@ void	sync_philo_start(t_philo *philo)
 }
 
 void	parse_args(char *argv[], t_table *data, int argc)
-{	
+{
 	ft_atoi(argv[1], &data->philo_count);
 	ft_atoi(argv[2], &data->time_to_die);
 	ft_atoi(argv[3], &data->time_to_eat);
 	ft_atoi(argv[4], &data->time_to_sleep);
-	
 	if (argc == 5)
 		data->must_eat = -1;
 	else
 		ft_atoi(argv[5], &data->must_eat);
-
-	// if (argc == 5)
-	// {
-	// 	if (ft_atoi(argv[1], &data->philo_count) || ft_atoi(argv[2],
-	// 			&data->time_to_die) || ft_atoi(argv[3], &data->time_to_eat)
-	// 		|| ft_atoi(argv[4], &data->time_to_sleep))
-	// 		handle_error(data, ERR_INVALID_ARG, NULL);
-	// }
-	// else
-	// {
-	// 	if (ft_atoi(argv[1], &data->philo_count) || ft_atoi(argv[2],
-	// 			&data->time_to_die) || ft_atoi(argv[3], &data->time_to_eat)
-	// 		|| ft_atoi(argv[4], &data->time_to_sleep) || ft_atoi(argv[5],
-	// 			&data->must_eat))
-	// 		handle_error(data, ERR_INVALID_ARG, NULL);
-	// }
-
 }
 
 void	print(t_philo *philo, char *str)

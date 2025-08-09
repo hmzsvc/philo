@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:41 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 22:20:59 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:29:13 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	ft_bzero(void *s, size_t n);
 int	main(int argc, char *argv[])
 {
 	t_table	data;
-	
+
 	ft_bzero(&data, sizeof(data));
 	if (argc == 5 || argc == 6)
 	{
@@ -35,7 +35,6 @@ int	main(int argc, char *argv[])
 	else
 	{
 		handle_error(&data, ERR_INVALID_ARG, NULL);
-		// printf("ERR_INVALID_ARG\n");
 		return (1);
 	}
 }
@@ -94,8 +93,8 @@ static void	initialize_forks(t_table *data)
 
 static void	ft_bzero(void *s, size_t n)
 {
-	size_t i;
-	char *str;
+	size_t	i;
+	char	*str;
 
 	i = 0;
 	str = (char *)s;

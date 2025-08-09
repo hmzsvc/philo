@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 20:54:50 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/09 16:53:38 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,16 @@ void	philo_join(t_table *data)
 		pthread_join(data->philos[i].thread, NULL);
 	}
 }
-void	ft_usleep(int wait_time, t_philo *philo) // neden ft_usleep?
+
+void	ft_usleep(int wait_time, t_philo *philo)
 {
-	unsigned long long time;
+	unsigned long long	time;
 
 	time = get_time();
 	while (get_time() - time < (unsigned long long)wait_time)
 	{
 		if (handle_dead(philo))
-			break;
+			break ;
 		usleep(100);
 	}
 }
@@ -53,7 +54,6 @@ void	*ft_calloc(size_t count, size_t size)
 	memory = malloc(total_size);
 	if (memory == NULL)
 		return (NULL);
-	// ft_memset'in içeriği doğrudan buraya entegre edildi
 	ptr = (unsigned char *)memory;
 	while (total_size > 0)
 	{

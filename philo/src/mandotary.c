@@ -6,7 +6,7 @@
 /*   By: hasivaci <hasivaci@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/06 12:42:28 by hasivaci          #+#    #+#             */
-/*   Updated: 2025/08/07 14:43:53 by hasivaci         ###   ########.fr       */
+/*   Updated: 2025/08/09 17:06:25 by hasivaci         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	philo_thinking(t_philo *philo)
 {
 	print(philo, "is thinking");
 	usleep(philo->data->time_to_die - (philo->data->time_to_eat
-			+ philo->data->time_to_sleep)); // BAKILACAK KONTROL ET!
+			+ philo->data->time_to_sleep));
 }
 
 void	philo_dead(t_philo philo)

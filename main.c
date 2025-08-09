@@ -1,62 +1,87 @@
-// #include <pthread.h>
-// #include <stdio.h>
-// #include <unistd.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-// typedef struct s_philo t_philo;
-// // int		bank = 1000;
-// typedef struct s_bank
-// {
-//     int cuurent_bank;
-//     int money;
-//     t_philo *philo;
+typedef struct s_threads t_threads;
 
-// }		t_bank;
+typedef struct s_bank
+{
+    int bank;
+    int process;
+    int human_count;
+    int start_flag;
+    pthread_mutex_t human_mutex;
+    pthread_mutex_t start_mutex;
+    t_threads *human;
+}t_bank;
 
-// typedef struct s_philo
-// {
-//     int id;
-//     pthread_t threads[5];
-//     t_bank *philo_bank;
+typedef struct s_threads
+{
+    int id;
+    pthread_t thread;
+    t_bank *bank;
+} t_threads;
 
-// }   t_philo;
-
-
-// void	*toplama(void *hüso)
-// {
-// 	t_bank	*data;
-//     usleep(1); 
-// 	data = (t_bank *)hüso;
-// 	data->cuurent_bank -= data->money;
-//     pthread_mutex_lock(data->cuurent_bank);
-// 	printf("işlemi yapan: %d banka sonucu: %d\n", data->philo->id, data->cuurent_bank);
+void *process(void *arg)
+{
+    t_threads *human;
+    human = (t_threads *)arg;
+    while (1)
+    {
+        pthread_mutex_lock(&human->bank->start_mutex);
+        if(human->bank->start_flag == 1)
+        {
+            pthread_mutex_unlock(&human->bank->start_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&human->bank->start_mutex);
+    }    
+    if (human->bank->start_flag == 1)
     
-// }
+    pthread_mutex_lock(&human->bank->human_mutex);
+    human->bank->bank -= human->bank->process;
+    printf("bank acount = %d process id = %d\n", human->bank->bank, human->id);
+    pthread_mutex_unlock(&human->bank->human_mutex);
+}
 
-// int	main(void)
-// {
-// 	t_bank	banker;
-// 	int				i;
-//     banker.cuurent_bank = 2000;
-//     banker.money = 250;
-//     t_philo filo;
-//     banker.philo = &filo;
 
-//     // i = -1;
-// 	// while (++i < 5)
-// 	// {
-//     //     filo.id = i;
-//     //     pthread_mutex_lock()
-        
-// 	// }
-//     pthread_create(&filo.threads[0], NULL, toplama, &banker);
-//     pthread_create(&filo.threads[1], NULL, toplama, &banker);
-//     pthread_join(filo.threads[0], NULL);
-//     pthread_join(filo.threads[1], NULL);
+int main()
+{
+    int i = -1;
+    
+    t_bank banker;
+    banker.human_count = 5;
+    banker.human = malloc(sizeof(t_threads) * banker.human_count);
+    banker.bank = 2000;
+    banker.process = 250;
+    banker.start_flag = 0;
 
-//     // i = -1;
-//     // while (++i < 5)
-//     // {
-        
-//     // }
-// 	return (0);
-// }
+    pthread_mutex_init(&banker.human_mutex,NULL);
+    pthread_mutex_init(&banker.start_mutex,NULL);
+
+    while (++i < banker.human_count)
+    {
+        banker.human[i].id = i + 1;
+        banker.human[i].bank = &banker;
+    }
+    
+    i = -1;
+    while (++i < banker.human_count)
+    {
+        pthread_create(&banker.human[i].thread, NULL, &process,&banker.human[i]);
+        //printf("hüso burada amk \n");
+        // pthread_join(banker.human[i].thread, NULL);
+    }
+    pthread_mutex_lock(&banker.start_mutex);
+    banker.start_flag = 1;
+    pthread_mutex_unlock(&banker.start_mutex);
+
+    i = -1;
+    while (++i < banker.human_count)
+    {
+        //pthread_create(&banker.human[i].thread, NULL, &process,&banker.human[i]);
+        //printf("hüso burada amk \n");
+        pthread_join(banker.human[i].thread, NULL);
+    }
+}
